@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <!-- SEO Meta Tags -->
-  <title>Vim Ninja: Master Vim Motions on a Split Keyboard</title>
-  <meta name="description" content="Master Vim motions and home row navigation on standard or split keyboards. Free interactive training game for Neovim and Vim enthusiasts.">
-  <meta name="keywords" content="vim, neovim, vim motions, split keyboard, corne, lily58, programmer game, learn vim">
-  
+  <title>Terminal IDE Cheatsheet: Neovim, tmux &amp; lazygit</title>
+  <meta name="description" content="A fast, searchable cheatsheet for Neovim, tmux, and lazygit shortcuts plus curated plugin picks — with an interactive keyboard preview and a Vim motions practice drill.">
+  <meta name="keywords" content="neovim, tmux, lazygit, cheatsheet, shortcuts, vim motions, terminal ide, plugins">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,153 +16,176 @@
   <!-- App Header -->
   <header>
     <div class="logo-section">
-      <h1 id="app-logo">VIM NINJA</h1>
+      <h1 id="app-logo">TERMINAL IDE CHEATSHEET</h1>
     </div>
-    
-    <div class="stats-dashboard">
-      <div class="stat-item" id="stat-score-container">
-        <span class="stat-label">Total Score</span>
-        <div class="stat-value-container">
-          <span class="stat-value score" id="stat-score">0</span>
-          <span class="xp-badge" id="stat-xp-gain">+0 XP</span>
+
+    <div class="header-mode header-mode-cheatsheet" id="header-cheatsheet-controls">
+      <nav class="tool-tabs" id="tool-tabs" aria-label="Tool selector">
+        <button class="tool-tab active" data-tool="neovim">Neovim</button>
+        <button class="tool-tab" data-tool="tmux">tmux</button>
+        <button class="tool-tab" data-tool="lazygit">lazygit</button>
+      </nav>
+      <input type="search" id="search-input" class="search-bar" placeholder="Search shortcuts &amp; plugins...">
+    </div>
+
+    <div class="header-mode header-mode-practice" id="header-practice-controls" style="display: none;">
+      <div class="stats-dashboard">
+        <div class="stat-item" id="stat-score-container">
+          <span class="stat-label">Total Score</span>
+          <div class="stat-value-container">
+            <span class="stat-value score" id="stat-score">0</span>
+            <span class="xp-badge" id="stat-xp-gain">+0 XP</span>
+          </div>
+        </div>
+        <div class="stat-item" id="stat-efficiency-container">
+          <span class="stat-label">Vim Efficiency</span>
+          <span class="stat-value" id="stat-efficiency">100%</span>
         </div>
       </div>
-      
-      <div class="stat-item" id="stat-efficiency-container">
-        <span class="stat-label">Vim Efficiency</span>
-        <span class="stat-value" id="stat-efficiency">100%</span>
-      </div>
-      
       <div class="header-controls">
         <button id="level-select-btn" class="btn-secondary">Campaign Map</button>
         <button id="reset-btn" class="btn-secondary" title="Reset all progress">Reset</button>
       </div>
     </div>
+
+    <button id="practice-toggle-btn" class="glow-btn">Practice Motions &rarr;</button>
   </header>
 
-  <!-- App Body Container -->
-  <div class="app-container">
-    
-    <aside class="campaign-sidebar" aria-label="Level list sidebar">
-      <div class="sidebar-title">Motions Campaign</div>
-      <div class="levels-table-container">
-        <table id="levels-table">
-          <thead>
-            <tr>
-              <th class="col-topic">Topic</th>
-              <th class="col-subtopics">Subtopics</th>
-              <th class="col-status">Status</th>
-            </tr>
-          </thead>
-          <tbody id="levels-table-body">
+  <!-- App Shell: cheatsheet view / practice view (mutually exclusive) + shared keyboard visualizer -->
+  <div class="app-shell">
+
+    <!-- Cheatsheet Reference View -->
+    <div class="app-container" id="cheatsheet-view">
+      <aside class="category-sidebar" id="category-nav" aria-label="Category navigation">
+        <!-- Populated dynamically by app.js -->
+      </aside>
+
+      <main class="cheatsheet-board" id="cheatsheet-board">
+        <p class="tool-tagline" id="tool-tagline"></p>
+        <div class="prefix-banner" id="prefix-banner" style="display: none;"></div>
+
+        <div id="shortcut-sections">
+          <!-- Populated dynamically by app.js -->
+        </div>
+
+        <section class="plugins-section" id="plugins-section">
+          <h2 class="section-heading">Recommended Plugins</h2>
+          <div class="plugins-grid" id="plugins-grid">
             <!-- Populated dynamically by app.js -->
-          </tbody>
-        </table>
-      </div>
-      <div class="sidebar-footer">
-        <!-- Footer info or small settings can go here -->
+          </div>
+        </section>
+
+        <p class="no-results-msg search-hidden" id="no-results-msg">No matches found. Try a different search term.</p>
+      </main>
+    </div>
+
+    <!-- Practice Motions View (Neovim only, hidden by default) -->
+    <div class="app-container" id="practice-view" style="display: none;">
+      <aside class="campaign-sidebar" aria-label="Level list sidebar">
+        <div class="sidebar-title">Motions Campaign</div>
+        <div class="levels-table-container">
+          <table id="levels-table">
+            <thead>
+              <tr>
+                <th class="col-topic">Topic</th>
+                <th class="col-subtopics">Subtopics</th>
+                <th class="col-status">Status</th>
+              </tr>
+            </thead>
+            <tbody id="levels-table-body">
+              <!-- Populated dynamically by practice.js -->
+            </tbody>
+          </table>
+        </div>
+      </aside>
+
+      <main class="game-board" id="main-board" aria-label="Main interactive dashboard">
+        <div class="game-workspace">
+
+          <section class="editor-panel" aria-label="Vim editor simulator">
+            <div class="editor-header">
+              <div class="editor-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <div class="editor-title" id="editor-filename">vim_ninja_sandbox.js</div>
+              <div class="editor-options">
+                <label for="rel-lines-toggle">
+                  <input type="checkbox" id="rel-lines-toggle" checked> Rel Lines
+                </label>
+              </div>
+            </div>
+
+            <div class="editor-body" id="editor-lines">
+              <!-- Rendered by practice.js -->
+            </div>
+
+            <div class="editor-statusline" id="vim-statusline">
+              <div class="status-left">
+                <span class="status-mode mode-normal" id="vim-status-mode"> NORMAL </span>
+                <span class="status-filename">sandbox.js</span>
+              </div>
+              <span class="status-keys" id="vim-status-keys"></span>
+              <div class="status-right">
+                <span class="status-percent" id="vim-status-percent">100%</span>
+                <span class="status-pos" id="vim-status-pos">1:1</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="guide-panel" aria-label="Instructions">
+            <div class="instruction-card" id="instruction-panel">
+              <div class="step-badge" id="step-indicator">Challenge 1 of 3</div>
+              <h2 id="level-title">1. Home Row Navigation</h2>
+              <p id="level-desc" class="instructions-text">Use h, j, k, l to navigate around the buffer.</p>
+
+              <hr style="border: 0; border-top: 1px solid var(--border-default);">
+
+              <p id="challenge-instr" class="instructions-text">Use key to reach the target...</p>
+
+              <div class="instruction-actions">
+                <button id="hint-btn" class="glow-btn">Get Hint</button>
+                <div class="hint-wrapper">
+                  <span id="hint-text">Hint: <span class="key-sequence">l</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="split-tip-card" id="split-tip-panel">
+              <div class="tip-icon">💡</div>
+              <div class="tip-content">
+                <h4>Split Keyboard Integration</h4>
+                <p id="split-tip-text">Using home row keys prevents your hands from leaving the keyboard split halves.</p>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+
+    <!-- Shared Split Keyboard Visualizer: driven by cheatsheet hover OR practice mode keystrokes -->
+    <aside class="keyboard-panel" id="keyboard-panel" aria-label="Keyboard visualizer">
+      <div class="keyboard-section" id="keyboard-visualizer">
+        <div class="keyboard-title">
+          <span id="keyboard-context-label">Hover a shortcut to see it on the keyboard</span>
+        </div>
+        <div class="keyboard-split-wrapper">
+          <div class="keyboard-half left-half" id="kb-left-half"></div>
+          <div class="keyboard-half right-half" id="kb-right-half"></div>
+        </div>
       </div>
     </aside>
 
-    <!-- Main Game Board Area -->
-    <main class="game-board" id="main-board" aria-label="Main interactive dashboard">
-      
-      <div class="game-workspace">
-        
-        <!-- Left Section: Interactive Neovim Mockup Editor -->
-        <section class="editor-panel" aria-label="Vim editor simulator">
-          <div class="editor-header">
-            <div class="editor-dots">
-              <span class="dot dot-red"></span>
-              <span class="dot dot-yellow"></span>
-              <span class="dot dot-green"></span>
-            </div>
-            <div class="editor-title" id="editor-filename">vim_ninja_sandbox.js</div>
-            <div class="editor-options">
-              <label for="rel-lines-toggle">
-                <input type="checkbox" id="rel-lines-toggle" checked> Rel Lines
-              </label>
-            </div>
-          </div>
-          
-          <!-- Code buffer lines go here -->
-          <div class="editor-body" id="editor-lines">
-            <!-- Rendered by app.js -->
-          </div>
-          
-          <!-- Mock Neovim Status Line -->
-          <div class="editor-statusline" id="vim-statusline">
-            <div class="status-left">
-              <span class="status-mode mode-normal" id="vim-status-mode"> NORMAL </span>
-              <span class="status-filename">sandbox.js</span>
-            </div>
-            <span class="status-keys" id="vim-status-keys"></span>
-            <div class="status-right">
-              <span class="status-percent" id="vim-status-percent">100%</span>
-              <span class="status-pos" id="vim-status-pos">1:1</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Right Section: Guides & Split Keyboard Visualizer -->
-        <section class="guide-panel" aria-label="Instructions and layout guides">
-          
-          <!-- Action / Level instructions card -->
-          <div class="instruction-card" id="instruction-panel">
-            <div class="step-badge" id="step-indicator">Challenge 1 of 3</div>
-            <h2 id="level-title">1. Home Row Navigation</h2>
-            <p id="level-desc" class="instructions-text">Use h, j, k, l to navigate around the buffer.</p>
-            
-            <hr style="border: 0; border-top: 1px solid var(--border-default);">
-            
-            <p id="challenge-instr" class="instructions-text">Use key to reach the target...</p>
-            
-            <div class="instruction-actions">
-              <button id="hint-btn" class="glow-btn">Get Hint</button>
-              <div class="hint-wrapper">
-                <span id="hint-text">Hint: <span class="key-sequence">l</span></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Split Keyboard Tip card (Ergonomic layout benefits) -->
-          <div class="split-tip-card" id="split-tip-panel">
-            <div class="tip-icon">💡</div>
-            <div class="tip-content">
-              <h4>Split Keyboard Integration</h4>
-              <p id="split-tip-text">Using home row keys prevents your hands from leaving the keyboard split halves. Keep wrists stationary.</p>
-            </div>
-          </div>
-
-          <!-- Physical Split Keyboard Visualizer layout -->
-          <div class="keyboard-section" id="keyboard-visualizer">
-            <div class="keyboard-title">
-              <span>Visual Split Layout Visualizer (Lily58/Corne Mockup)</span>
-              <span>Home Row Highlighted</span>
-            </div>
-            
-            <div class="keyboard-split-wrapper">
-              <!-- Left Half -->
-              <div class="keyboard-half left-half" id="kb-left-half">
-                <!-- Rendered dynamically by app.js -->
-              </div>
-              
-              <!-- Right Half -->
-              <div class="keyboard-half right-half" id="kb-right-half">
-                <!-- Rendered dynamically by app.js -->
-              </div>
-            </div>
-          </div>
-
-        </section>
-        
-      </div>
-      
-    </main>
-
   </div>
 
-  <!-- Campaign Map Level Selection Modal -->
+  <footer class="app-footer">
+    <span>Terminal IDE Cheatsheet</span>
+    <span class="app-footer-version" id="app-version-label"></span>
+  </footer>
+
+  <!-- Campaign Map Level Selection Modal (Practice Mode) -->
   <div class="modal-overlay" id="level-modal" style="display: none;" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-header">
@@ -171,14 +194,16 @@
       </div>
       <div class="modal-body">
         <div class="levels-grid" id="modal-levels-list">
-          <!-- Rendered dynamically by app.js -->
+          <!-- Rendered dynamically by practice.js -->
         </div>
       </div>
     </div>
   </div>
 
   <!-- Scripts -->
+  <script src="cheatsheet.js"></script>
   <script src="levels.js"></script>
+  <script src="practice.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

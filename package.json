@@ -1,7 +1,7 @@
 {
-  "name": "vim-motions-game",
-  "version": "1.0.0",
-  "description": "A gamified learning application for mastering Vim motions on a split keyboard layout.",
+  "name": "terminal-ide-cheatsheet",
+  "version": "2.0.0",
+  "description": "A searchable cheatsheet for Neovim, tmux, and lazygit shortcuts and curated plugins, with an interactive keyboard preview and a Vim motions practice drill.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -10,9 +10,11 @@
   "keywords": [
     "vim",
     "neovim",
-    "motions",
-    "game",
-    "split-keyboard"
+    "tmux",
+    "lazygit",
+    "cheatsheet",
+    "terminal",
+    "shortcuts"
   ],
   "author": "Antigravity",
   "license": "MIT"
