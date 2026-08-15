@@ -835,10 +835,16 @@ main.game-board {
 }
 
 /* Tool Tabs: minimal underline style */
+/* Scrolls horizontally instead of clipping/overflowing when there isn't room for
+   every tab (e.g. narrow windows, or more tabs added later) — every tab stays reachable. */
 .tool-tabs {
   display: flex;
   gap: 4px;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .tool-tab {
@@ -852,6 +858,8 @@ main.game-board {
   font-family: var(--font-ui);
   font-size: 12.5px;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: var(--transition-fast);
 }
 
@@ -866,7 +874,8 @@ main.game-board {
 
 /* Search Bar */
 .search-bar {
-  flex: 1;
+  flex: 1 1 120px;
+  min-width: 0; /* inputs default to an intrinsic min-width that ignores flex-shrink otherwise */
   max-width: 320px;
   background-color: var(--bg-primary);
   border: 1px solid var(--border-default);
