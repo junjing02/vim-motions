@@ -16,7 +16,7 @@
 
   --text-primary: #16181d;
   --text-secondary: #5a606a;
-  --text-muted: #9aa0aa;
+  --text-muted: #6b7178;  /* darkened from a lighter gray for WCAG AA contrast at small sizes */
 
   --border-default: #e3e5e8;  /* thin, subtle divider used almost everywhere */
   --border-strong: #16181d;   /* reserved for active/focus/emphasis states only */
@@ -35,7 +35,6 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  user-select: none;
 }
 
 body {
@@ -43,9 +42,19 @@ body {
   color: var(--text-primary);
   font-family: var(--font-ui);
   height: 100vh;
+  height: 100dvh; /* dynamic viewport height: avoids mobile browsers' address-bar jump */
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Reference content (shortcuts, commands, descriptions) stays selectable/copyable —
+   only interactive chrome blocks selection, to avoid an accidental-highlight look on tap */
+button, .tool-tab, .category-nav-item, .subtopic-badge, .level-row,
+.close-btn, .editor-char {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* App Header */
@@ -586,110 +595,6 @@ main.game-board {
   line-height: 1.5;
 }
 
-/* Keyboard Visualizer Section */
-.keyboard-section {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius);
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.keyboard-title {
-  font-size: 11px;
-  color: var(--text-secondary);
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border-default);
-  padding-bottom: 8px;
-}
-
-/* Stacked (not side-by-side): a 7-key row needs ~254px on its own, which a narrow
-   side panel can't fit twice across. Stacking keeps every key on screen. */
-.keyboard-split-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 5px 0;
-}
-
-.keyboard-half {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  align-items: center;
-}
-
-.keyboard-row {
-  display: flex;
-  gap: 5px;
-  justify-content: center;
-}
-
-/* Keycap Styling: flat, thin border */
-.key-btn {
-  width: 32px;
-  height: 32px;
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: all 0.08s ease;
-}
-
-.key-btn span {
-  font-family: var(--font-code);
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.key-btn.thumb-key {
-  width: 48px;
-  background-color: var(--bg-darker);
-}
-
-.key-btn.home-cap {
-  background-color: var(--bg-primary);
-}
-
-/* Homing Key Bump */
-.homing-bump {
-  width: 8px;
-  height: 1.5px;
-  background-color: var(--text-muted);
-  position: absolute;
-  bottom: 6px;
-}
-
-/* Active Highlight */
-.key-btn.key-active {
-  border-color: var(--accent-cyan);
-  background-color: #eaf3fa;
-}
-
-.key-btn.key-active span {
-  color: var(--accent-cyan);
-  font-weight: bold;
-}
-
-/* Pressed feedback: a distinct color from the blue "active/guidance" highlight above,
-   so "you just pressed this" reads differently from "this is the key to press" */
-.key-btn.key-pressed {
-  background-color: var(--accent-green);
-  border-color: var(--accent-green);
-}
-
-.key-btn.key-pressed span {
-  color: var(--bg-secondary);
-}
-
 /* Win Overlay Modal Styles */
 .win-overlay {
   position: fixed;
@@ -897,7 +802,7 @@ main.game-board {
 
 /* ==========================================================================
    Cheatsheet: header modes, tabs, search, category nav, shortcut cards,
-   plugin cards, and the shared keyboard panel.
+   and plugin cards.
    ========================================================================== */
 
 /* A key-cap chip — used in instructions, shortcut cards, and the prefix banner */
@@ -981,7 +886,7 @@ main.game-board {
   color: var(--text-muted);
 }
 
-/* App Shell: cheatsheet-view / practice-view (mutually exclusive) + shared keyboard panel */
+/* App Shell: cheatsheet-view / practice-view (mutually exclusive) */
 .app-shell {
   display: flex;
   flex: 1;
@@ -1210,26 +1115,6 @@ main.game-board {
   display: none;
 }
 
-/* Shared Keyboard Panel (persistent across cheatsheet + practice views).
-   320px is the minimum to fit the widest key row (7 keys) without clipping. */
-.keyboard-panel {
-  width: 320px;
-  flex-shrink: 0;
-  background-color: var(--bg-secondary);
-  border-left: 1px solid var(--border-default);
-  padding: 15px;
-  overflow-y: auto;
-}
-
-.keyboard-panel .keyboard-section {
-  border: none;
-  padding: 0;
-}
-
-#keyboard-context-label {
-  font-size: 11px;
-}
-
 /* App Footer (version stamp, present on every view) */
 .app-footer {
   height: 26px;
@@ -1250,18 +1135,84 @@ main.game-board {
   font-weight: 700;
 }
 
-/* Basic responsiveness: shed secondary panels before content overlaps */
-@media (max-width: 1000px) {
-  .keyboard-panel {
+/* Mobile: header wraps to two rows, panels that assume desktop width are hidden
+   in favor of their modal/scroll equivalents, and tap targets grow. */
+@media (max-width: 700px) {
+  header {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  .header-mode {
+    flex-basis: 100%;
+    order: 3;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .logo-section h1 {
+    font-size: 13px;
+  }
+
+  .tool-tabs {
+    gap: 2px;
+  }
+
+  .tool-tab {
+    padding: 10px 6px;
+    margin: 0 6px 0 0;
+  }
+
+  .search-bar {
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: 140px;
+  }
+
+  .btn-secondary, .glow-btn {
+    padding: 9px 12px;
+  }
+
+  .stats-dashboard {
+    gap: 14px;
+  }
+
+  /* Campaign sidebar assumes desktop width; the "Campaign Map" button/modal
+     already gives full access to every level on small screens */
+  aside.campaign-sidebar {
     display: none;
   }
-}
 
-@media (max-width: 700px) {
+  .game-workspace {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  main.game-board {
+    padding: 12px;
+  }
+
+  .cheatsheet-board {
+    padding: 18px 16px 32px;
+  }
+
+  .instruction-card {
+    padding: 15px;
+  }
+
   .shortcut-list {
     grid-template-columns: 1fr;
   }
-  .header-mode-cheatsheet .search-bar {
-    max-width: 160px;
+
+  .win-card {
+    width: auto;
+    max-width: 90vw;
+  }
+
+  .final-win {
+    width: auto;
+    max-width: 90vw;
   }
 }

@@ -1,6 +1,5 @@
 // practice.js - Vim Motions Practice Drill (extracted engine, reused by the Neovim tab's "Practice Motions" mode)
-// Shares the keyboard visualizer owned by app.js: calls setKeyboardActiveKeys()/highlightPhysicalKey()
-// defined there. Only responds to keystrokes while isPracticeActive is true.
+// Only responds to keystrokes while isPracticeActive is true.
 let isPracticeActive = false;
 
 // Game State
@@ -27,10 +26,9 @@ let practiceState = {
   levelStartTime: null,
   relativeLines: true,   // Toggle relative line numbers
   completedLevels: new Set(),
-  activeKeys: new Set(), // Keys that are active/highlighted for the current level
 };
 
-// Initialize Practice Mode (keyboard visualizer itself is initialized once by app.js)
+// Initialize Practice Mode
 window.addEventListener("DOMContentLoaded", () => {
   loadLevel(0, 0);
   setupPracticeEventListeners();
@@ -106,10 +104,6 @@ function loadLevel(levelIdx, challengeIdx) {
   practiceState.cursor = { ...challenge.start };
   practiceState.visualAnchor = { ...challenge.start };
 
-  // Set active keys for keyboard highlighting
-  practiceState.activeKeys.clear();
-  extractActiveKeys(level.id);
-
   // Stats initializations
   practiceState.levelKeystrokes = 0;
   practiceState.levelStartTime = new Date();
@@ -123,31 +117,10 @@ function loadLevel(levelIdx, challengeIdx) {
   document.getElementById("split-tip-text").textContent = challenge.splitTip || "";
 
   renderEditor();
-  if (isPracticeActive) setKeyboardActiveKeys(Array.from(practiceState.activeKeys));
   updateStatusLine();
-  
+
   document.getElementById("hint-text").style.opacity = 0;
   updateSidebarHighlights();
-}
-
-function extractActiveKeys(levelId) {
-  const map = {
-    "basic-vim": ["h", "j", "k", "l", "w", "e", "b", "i", "a", "Escape"],
-    "insert-pro": ["i", "a", "o", "o", "s", "x", "r", "escape"],
-    "essential-motions": ["w", "e", "b", "0", "_", "$", "f", "f", "t", "t", ";", ","],
-    "basic-operators": ["d", "c", "y", "p", "w", "j", "k", "escape"],
-    "advanced-vertical": ["j", "k", "g", "g", "{", "}", "ctrl", "u", "d"],
-    "search": ["/", "?", "n", "n", "*", "#", "escape", "enter"],
-    "text-objects-brackets": ["d", "c", "i", "a", "{", "}", "(", ")", "[", "]"],
-    "text-objects-quotes": ["d", "c", "i", "a", "\"", "'", "escape"],
-    "text-objects-words": ["d", "c", "i", "a", "w"],
-    "text-objects-paragraphs": ["d", "c", "i", "a", "p"],
-    "text-objects-mega-review": ["d", "c", "i", "a", "w", "{", "}", "'", "\""],
-    "visual-mode": ["v", "v", "d", "c", "y", "o", "escape"]
-  };
-  
-  const keys = map[levelId] || [];
-  keys.forEach(k => practiceState.activeKeys.add(k));
 }
 
 // Check character visual selection state
@@ -325,16 +298,13 @@ function handleGlobalKeyDown(e) {
 
   // Catch modifiers by themselves
   if (["Control", "Shift", "Alt", "Meta"].includes(e.key)) {
-    highlightPhysicalKey(e.key);
     return;
   }
 
-  // Keyboard mapping and animations
   let keyStr = e.key;
   if (e.ctrlKey && e.key !== "Control") {
     keyStr = `Ctrl+${e.key.toLowerCase()}`;
   }
-  highlightPhysicalKey(keyStr);
 
   practiceState.levelKeystrokes++;
   practiceState.totalKeystrokes++;

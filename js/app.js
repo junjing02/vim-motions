@@ -1,189 +1,10 @@
-// app.js - Cheatsheet controller: tool tabs, category nav, live search, and the shared
-// split-keyboard visualizer (used both for shortcut hover-highlight here and by practice.js
-// during the Neovim motions drill).
+// app.js - Cheatsheet controller: tool tabs, category nav, live search, and the
+// Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.1.1";
+const APP_VERSION = "2.2.0";
 
 let currentTool = "neovim";
-
-// Keyboard layout mapping for visual display (QWERTY split layout keys)
-const PHYSICAL_KEY_MAP = {
-  // Left half
-  "Escape": "key-esc", "q": "key-q", "w": "key-w", "e": "key-e", "r": "key-r", "t": "key-t",
-  "a": "key-a", "s": "key-s", "d": "key-d", "f": "key-f", "g": "key-g",
-  "z": "key-z", "x": "key-x", "c": "key-c", "v": "key-v", "b": "key-b",
-  "Control": "key-ctrl-l", "Alt": "key-alt-l", "Shift": "key-shift-l", " ": "key-space-l",
-  // Right half
-  "y": "key-y", "u": "key-u", "i": "key-i", "o": "key-o", "p": "key-p", "Backspace": "key-bksp",
-  "h": "key-h", "j": "key-j", "k": "key-k", "l": "key-l", ";": "key-semicolon", "'": "key-quote", "Enter": "key-enter",
-  "n": "key-n", "m": "key-m", ",": "key-comma", ".": "key-dot", "/": "key-slash",
-  " ": "key-space-r", "AltGraph": "key-alt-r", "Meta": "key-gui-r",
-  // Layer shifted mappings for visual feedback
-  "_": "key-dash", "$": "key-four", "*": "key-eight", "#": "key-three", "{": "key-bracket-l", "}": "key-bracket-r",
-  "(": "key-nine", ")": "key-zero", "\"": "key-quote", "?": "key-slash"
-};
-
-// Short-form aliases used in cheatsheet copy that don't match PHYSICAL_KEY_MAP's raw KeyboardEvent.key names
-const KEY_ALIASES = { "Esc": "Escape", "Ctrl": "Control", "Cmd": "Meta" };
-
-function resolveSingleKeyId(part) {
-  const normalized = KEY_ALIASES[part] || part;
-  return PHYSICAL_KEY_MAP[normalized] || PHYSICAL_KEY_MAP[normalized.toLowerCase()] || null;
-}
-
-// Resolves a display token (e.g. "g", "Ctrl+v", "Prefix", "{motion}") to physical key element ids.
-// Unmapped/placeholder tokens (digits, "{char}", "Arrow", "h/j/k/l") resolve to [] and are skipped
-// gracefully rather than erroring — not every cheatsheet token corresponds to a single physical key.
-function keyTokenToElementIds(token, prefixKey) {
-  if (token === "Prefix") {
-    return keyTokenToElementIds(prefixKey || "Ctrl+b", null);
-  }
-  if (token.includes("+")) {
-    return token.split("+").map(resolveSingleKeyId).filter(Boolean);
-  }
-  const id = resolveSingleKeyId(token);
-  return id ? [id] : [];
-}
-
-function setKeyboardActiveKeys(tokens, prefixKey) {
-  clearKeyboardActiveKeys();
-  const ids = new Set();
-  (tokens || []).forEach(token => {
-    keyTokenToElementIds(String(token), prefixKey).forEach(id => ids.add(id));
-  });
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.add("key-active");
-  });
-}
-
-function clearKeyboardActiveKeys() {
-  document.querySelectorAll(".key-btn").forEach(el => el.classList.remove("key-active"));
-}
-
-function highlightPhysicalKey(key) {
-  let mappedId = PHYSICAL_KEY_MAP[key];
-  if (!mappedId && key.length === 1) {
-    mappedId = PHYSICAL_KEY_MAP[key.toLowerCase()];
-  }
-
-  if (mappedId) {
-    const keyEl = document.getElementById(mappedId);
-    if (keyEl) {
-      keyEl.classList.add("key-pressed");
-      setTimeout(() => {
-        keyEl.classList.remove("key-pressed");
-      }, 150);
-    }
-  }
-}
-
-// Generate the visual keyboard markup (built once; shared by the cheatsheet hover-highlight
-// and the practice-mode key-press animation)
-function initKeyboard() {
-  const leftHalf = document.getElementById("kb-left-half");
-  const rightHalf = document.getElementById("kb-right-half");
-
-  leftHalf.innerHTML = "";
-  rightHalf.innerHTML = "";
-
-  const leftRows = [
-    [
-      { code: "Escape", label: "Esc", id: "key-esc" },
-      { code: "q", label: "Q", id: "key-q" },
-      { code: "w", label: "W", id: "key-w" },
-      { code: "e", label: "E", id: "key-e" },
-      { code: "r", label: "R", id: "key-r" },
-      { code: "t", label: "T", id: "key-t" }
-    ],
-    [
-      { code: "Tab", label: "Tab", id: "key-tab" },
-      { code: "a", label: "A", id: "key-a", home: true },
-      { code: "s", label: "S", id: "key-s", home: true },
-      { code: "d", label: "D", id: "key-d", home: true },
-      { code: "f", label: "F", id: "key-f", home: true },
-      { code: "g", label: "G", id: "key-g" }
-    ],
-    [
-      { code: "Shift", label: "Shift", id: "key-shift-l" },
-      { code: "z", label: "Z", id: "key-z" },
-      { code: "x", label: "X", id: "key-x" },
-      { code: "c", label: "C", id: "key-c" },
-      { code: "v", label: "V", id: "key-v" },
-      { code: "b", label: "B", id: "key-b" }
-    ],
-    [
-      { code: "Control", label: "Ctrl", id: "key-ctrl-l" },
-      { code: "Alt", label: "Alt", id: "key-alt-l" },
-      { code: " ", label: "Space", id: "key-space-l", class: "thumb-key" }
-    ]
-  ];
-
-  const rightRows = [
-    [
-      { code: "y", label: "Y", id: "key-y" },
-      { code: "u", label: "U", id: "key-u" },
-      { code: "i", label: "I", id: "key-i" },
-      { code: "o", label: "O", id: "key-o" },
-      { code: "p", label: "P", id: "key-p" },
-      { code: "Backspace", label: "Bksp", id: "key-bksp" }
-    ],
-    [
-      { code: "h", label: "H", id: "key-h" },
-      { code: "j", label: "J", id: "key-j", home: true },
-      { code: "k", label: "K", id: "key-k", home: true },
-      { code: "l", label: "L", id: "key-l", home: true },
-      { code: ";", label: ";", id: "key-semicolon", home: true },
-      { code: "'", label: "'", id: "key-quote" },
-      { code: "Enter", label: "Enter", id: "key-enter" }
-    ],
-    [
-      { code: "Shift", label: "Shift", id: "key-shift-r" },
-      { code: "n", label: "N", id: "key-n" },
-      { code: "m", label: "M", id: "key-m" },
-      { code: ",", label: ",", id: "key-comma" },
-      { code: ".", label: ".", id: "key-dot" },
-      { code: "/", label: "/", id: "key-slash" }
-    ],
-    [
-      { code: " ", label: "Space", id: "key-space-r", class: "thumb-key" },
-      { code: "Meta", label: "GUI", id: "key-gui-r" },
-      { code: "AltGraph", label: "Alt", id: "key-alt-r" }
-    ]
-  ];
-
-  renderHalfKeyboard(leftHalf, leftRows);
-  renderHalfKeyboard(rightHalf, rightRows);
-}
-
-function renderHalfKeyboard(container, rows) {
-  rows.forEach(row => {
-    const rowEl = document.createElement("div");
-    rowEl.className = "keyboard-row";
-    row.forEach(key => {
-      const keyEl = document.createElement("div");
-      keyEl.className = `key-btn ${key.class || ""}`;
-      keyEl.id = key.id;
-
-      const keyInner = document.createElement("span");
-      keyInner.textContent = key.label;
-      keyEl.appendChild(keyInner);
-
-      if (key.home) {
-        keyEl.classList.add("home-cap");
-        if (key.code === "f" || key.code === "j") {
-          const bump = document.createElement("div");
-          bump.className = "homing-bump";
-          keyEl.appendChild(bump);
-        }
-      }
-
-      rowEl.appendChild(keyEl);
-    });
-    container.appendChild(rowEl);
-  });
-}
 
 // --- Cheatsheet rendering ---
 
@@ -211,8 +32,6 @@ function renderTool(toolId) {
 
   document.getElementById("search-input").value = "";
   filterCheatsheet("");
-  clearKeyboardActiveKeys();
-  document.getElementById("keyboard-context-label").textContent = "Hover a shortcut to see it on the keyboard";
 
   document.getElementById("practice-toggle-btn").style.display = (toolId === "neovim") ? "" : "none";
 
@@ -291,18 +110,6 @@ function renderShortcutSections(tool) {
 
       card.appendChild(keysEl);
       card.appendChild(descEl);
-
-      if (sc.keys) {
-        card.addEventListener("mouseenter", () => {
-          setKeyboardActiveKeys(sc.keys, tool.prefixKey);
-          document.getElementById("keyboard-context-label").textContent = sc.desc;
-        });
-        card.addEventListener("mouseleave", () => {
-          clearKeyboardActiveKeys();
-          document.getElementById("keyboard-context-label").textContent = "Hover a shortcut to see it on the keyboard";
-        });
-      }
-
       list.appendChild(card);
     });
 
@@ -378,16 +185,12 @@ function togglePracticeMode() {
     headerCheatsheet.style.display = "none";
     headerPractice.style.display = "flex";
     toggleBtn.textContent = "← Back to Cheatsheet";
-    setKeyboardActiveKeys(Array.from(practiceState.activeKeys));
-    document.getElementById("keyboard-context-label").textContent = "Practice Motions — active level keys";
   } else {
     practiceView.style.display = "none";
     cheatsheetView.style.display = "flex";
     headerPractice.style.display = "none";
     headerCheatsheet.style.display = "flex";
     toggleBtn.textContent = "Practice Motions →";
-    clearKeyboardActiveKeys();
-    document.getElementById("keyboard-context-label").textContent = "Hover a shortcut to see it on the keyboard";
   }
 }
 
@@ -395,8 +198,6 @@ function togglePracticeMode() {
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("app-version-label").textContent = `v${APP_VERSION}`;
-
-  initKeyboard();
 
   document.querySelectorAll(".tool-tab").forEach(btn => {
     btn.addEventListener("click", () => renderTool(btn.dataset.tool));

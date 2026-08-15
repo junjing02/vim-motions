@@ -6,7 +6,7 @@
 
   <!-- SEO Meta Tags -->
   <title>Terminal IDE Cheatsheet: Neovim, tmux &amp; lazygit</title>
-  <meta name="description" content="A fast, searchable cheatsheet for Neovim, tmux, and lazygit shortcuts plus curated plugin picks — with an interactive keyboard preview and a Vim motions practice drill.">
+  <meta name="description" content="A fast, searchable cheatsheet for Neovim, tmux, and lazygit shortcuts plus curated plugin picks — with a Vim motions practice drill.">
   <meta name="keywords" content="neovim, tmux, lazygit, cheatsheet, shortcuts, vim motions, terminal ide, plugins">
 
   <link rel="stylesheet" href="css/style.css">
@@ -51,7 +51,7 @@
     <button id="practice-toggle-btn" class="glow-btn">Practice Motions &rarr;</button>
   </header>
 
-  <!-- App Shell: cheatsheet view / practice view (mutually exclusive) + shared keyboard visualizer -->
+  <!-- App Shell: cheatsheet view / practice view (mutually exclusive) -->
   <div class="app-shell">
 
     <!-- Cheatsheet Reference View -->
@@ -156,19 +156,6 @@
         </div>
       </main>
     </div>
-
-    <!-- Shared Split Keyboard Visualizer: driven by cheatsheet hover OR practice mode keystrokes -->
-    <aside class="keyboard-panel" id="keyboard-panel" aria-label="Keyboard visualizer">
-      <div class="keyboard-section" id="keyboard-visualizer">
-        <div class="keyboard-title">
-          <span id="keyboard-context-label">Hover a shortcut to see it on the keyboard</span>
-        </div>
-        <div class="keyboard-split-wrapper">
-          <div class="keyboard-half left-half" id="kb-left-half"></div>
-          <div class="keyboard-half right-half" id="kb-right-half"></div>
-        </div>
-      </div>
-    </aside>
 
   </div>
 
