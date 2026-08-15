@@ -2,7 +2,7 @@
 // Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.3.1";
+const APP_VERSION = "2.4.0";
 
 let currentTool = "neovim";
 
@@ -28,6 +28,14 @@ function renderTool(toolId) {
 
   document.getElementById("plugins-section-heading").textContent = tool.pluginsLabel || "Recommended Plugins";
 
+  const keyboardSection = document.getElementById("corne-keyboard-section");
+  if (tool.keyboardLayout) {
+    keyboardSection.style.display = "block";
+    renderCorneKeyboard(tool.keyboardLayout);
+  } else {
+    keyboardSection.style.display = "none";
+  }
+
   renderCategoryNav(tool);
   renderShortcutSections(tool);
   renderPluginsGrid(tool);
@@ -38,6 +46,65 @@ function renderTool(toolId) {
   document.getElementById("practice-toggle-btn").style.display = (toolId === "neovim") ? "" : "none";
 
   document.getElementById("cheatsheet-board").scrollTop = 0;
+}
+
+// --- Corne 42 keyboard layer viewer ---
+
+function renderCorneKeyboard(layout) {
+  const tabsEl = document.getElementById("corne-layer-tabs");
+  const noteEl = document.getElementById("corne-keyboard-note");
+  noteEl.textContent = layout.note;
+
+  tabsEl.innerHTML = "";
+  layout.layers.forEach((layer, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "corne-layer-tab" + (idx === 0 ? " active" : "");
+    btn.textContent = layer.label;
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".corne-layer-tab").forEach(el => el.classList.remove("active"));
+      btn.classList.add("active");
+      renderCorneGrid(layer, layout.thumbs);
+    });
+    tabsEl.appendChild(btn);
+  });
+
+  renderCorneGrid(layout.layers[0], layout.thumbs);
+}
+
+function renderCorneGrid(layer, thumbs) {
+  const grid = document.getElementById("corne-keyboard-grid");
+  grid.innerHTML = "";
+
+  layer.rows.forEach(row => {
+    const rowEl = document.createElement("div");
+    rowEl.className = "corne-row";
+    row.forEach((label, colIdx) => {
+      rowEl.appendChild(makeCorneKey(label));
+      if (colIdx === 5) rowEl.appendChild(makeCorneHandGap());
+    });
+    grid.appendChild(rowEl);
+  });
+
+  const thumbRow = document.createElement("div");
+  thumbRow.className = "corne-row corne-thumb-row";
+  thumbs.forEach((label, idx) => {
+    thumbRow.appendChild(makeCorneKey(label));
+    if (idx === 2) thumbRow.appendChild(makeCorneHandGap());
+  });
+  grid.appendChild(thumbRow);
+}
+
+function makeCorneKey(label) {
+  const el = document.createElement("div");
+  el.className = "corne-key" + (label === "·" ? " corne-key-trans" : "");
+  el.textContent = label;
+  return el;
+}
+
+function makeCorneHandGap() {
+  const gap = document.createElement("div");
+  gap.className = "corne-hand-gap";
+  return gap;
 }
 
 function renderCategoryNav(tool) {

@@ -973,6 +973,105 @@ main.game-board {
   margin: 0 3px;
 }
 
+/* Corne 42 Keyboard Layer Viewer */
+.corne-keyboard-section {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.corne-layer-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.corne-layer-tab {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.corne-layer-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.corne-layer-tab.active {
+  background-color: var(--text-primary);
+  color: var(--bg-secondary);
+  border-color: var(--text-primary);
+}
+
+/* Scrolls horizontally on narrow screens rather than squeezing 12 columns illegible */
+.corne-keyboard-scroll {
+  overflow-x: auto;
+}
+
+.corne-keyboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: max-content;
+  padding: 4px 2px;
+}
+
+.corne-row {
+  display: flex;
+  gap: 6px;
+}
+
+.corne-thumb-row {
+  margin-top: 10px;
+  padding-left: 120px; /* thumbs sit inward, under the middle columns, not under the pinky edge */
+}
+
+.corne-hand-gap {
+  width: 18px;
+  flex-shrink: 0;
+}
+
+.corne-key {
+  width: 48px;
+  height: 34px;
+  flex-shrink: 0;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-code);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.corne-key-trans {
+  background-color: transparent;
+  border-style: dashed;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.corne-keyboard-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* Shortcut Categories & Cards */
 .shortcut-category {
   display: flex;

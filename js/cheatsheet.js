@@ -305,6 +305,51 @@ const CHEATSHEETS = {
     tagline: "A 42-key split keyboard — 3×6 per hand plus 3 thumb keys. Layers do the work a number row and function keys would on a full-size board.",
     prefixKey: null,
     pluginsLabel: "Firmware & Layout Resources",
+    // One illustrative beginner layout, not a universal standard — Corne configs vary widely.
+    // "·" marks a transparent key (falls through to the base layer). Thumbs stay constant
+    // across layers since the layer-access keys themselves don't usually change.
+    keyboardLayout: {
+      note: "One example layout to learn the concepts from — real Corne configs vary a lot. \"·\" means the key is transparent (falls through to Base).",
+      thumbs: ["GUI", "Lower", "Space", "Enter", "Raise", "Alt"],
+      layers: [
+        {
+          id: "base",
+          label: "Base",
+          rows: [
+            ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Bspc"],
+            ["Esc", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'"],
+            ["Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift"]
+          ]
+        },
+        {
+          id: "lower",
+          label: "Lower",
+          rows: [
+            ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "Del"],
+            ["·", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "·"],
+            ["·", "-", "=", "[", "]", "\\", "_", "+", "{", "}", "|", "·"]
+          ]
+        },
+        {
+          id: "raise",
+          label: "Raise",
+          rows: [
+            ["·", "·", "·", "·", "·", "·", "·", "Home", "PgDn", "PgUp", "End", "·"],
+            ["·", "·", "·", "·", "·", "·", "·", "Left", "Down", "Up", "Right", "·"],
+            ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·"]
+          ]
+        },
+        {
+          id: "adjust",
+          label: "Adjust",
+          rows: [
+            ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "BOOT"],
+            ["·", "·", "·", "·", "·", "RGB", "·", "·", "·", "·", "·", "·"],
+            ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·"]
+          ]
+        }
+      ]
+    },
     categories: [
       {
         id: "basics",
