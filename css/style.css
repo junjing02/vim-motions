@@ -1,29 +1,33 @@
-/* style.css - Light mode minimalist terminal-style stylesheet */
+/* style.css - Minimal terminal-inspired stylesheet: thin borders, soft neutrals, no drop-shadow chrome */
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 
 :root {
-  --bg-primary: #f0f0f0;
+  --bg-primary: #f7f7f8;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #e0e0e0;
-  --bg-darker: #fbfbfb;
-  
-  --accent-cyan: #005080;   /* High-contrast blue for cursor/selections */
-  --accent-pink: #a00050;   /* Deep magenta for keywords */
-  --accent-green: #006000;  /* Dark green for strings */
-  --accent-purple: #500080;
-  --accent-red: #d00000;    /* For target indicators */
-  
-  --text-primary: #111111;
-  --text-secondary: #444444;
-  --text-muted: #888888;
-  
-  --border-default: #222222; /* Sharp terminal-like borders */
-  
+  --bg-tertiary: #eef0f2;
+  --bg-darker: #fafafa;
+
+  --accent-cyan: #0868a8;
+  --accent-pink: #a8305a;
+  --accent-green: #227a4a;
+  --accent-purple: #6a3fa0;
+  --accent-red: #c23b3b;
+
+  --text-primary: #16181d;
+  --text-secondary: #5a606a;
+  --text-muted: #9aa0aa;
+
+  --border-default: #e3e5e8;  /* thin, subtle divider used almost everywhere */
+  --border-strong: #16181d;   /* reserved for active/focus/emphasis states only */
+
   --font-ui: 'JetBrains Mono', monospace;
   --font-code: 'JetBrains Mono', monospace;
-  
-  --transition-fast: 0.1s ease;
+
+  --radius: 8px;
+  --radius-sm: 5px;
+
+  --transition-fast: 0.12s ease;
 }
 
 /* Base Styles */
@@ -46,9 +50,9 @@ body {
 
 /* App Header */
 header {
-  height: 60px;
+  height: 56px;
   background-color: var(--bg-secondary);
-  border-bottom: 2px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   gap: 20px;
@@ -57,23 +61,10 @@ header {
 }
 
 .logo-section h1 {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.2px;
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-section h1::after {
-  content: 'LIGHT_MODE';
-  font-size: 9px;
-  padding: 1px 5px;
-  border: 1px solid var(--border-default);
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border-radius: 0;
 }
 
 .stats-dashboard {
@@ -90,9 +81,8 @@ header {
 
 .stat-label {
   font-size: 10px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  font-weight: bold;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 .stat-value-container {
@@ -102,7 +92,7 @@ header {
 }
 
 .stat-value {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
   font-family: var(--font-code);
@@ -133,32 +123,30 @@ header {
 
 .header-controls {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* Retro-terminal flat button with shadow */
+/* Flat minimal button: thin border, subtle hover tint, no shadow/pop */
 .btn-secondary, .glow-btn {
   background-color: var(--bg-secondary);
-  border: 2px solid var(--border-default);
+  border: 1px solid var(--border-default);
   color: var(--text-primary);
-  padding: 6px 12px;
+  padding: 7px 14px;
   cursor: pointer;
   font-family: var(--font-ui);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   transition: var(--transition-fast);
-  box-shadow: 2px 2px 0px var(--border-default);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
 }
 
 .btn-secondary:hover, .glow-btn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0px var(--border-default);
+  background-color: var(--bg-tertiary);
+  border-color: var(--text-secondary);
 }
 
 .btn-secondary:active, .glow-btn:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px var(--border-default);
+  background-color: var(--border-default);
 }
 
 /* Main Layout Grid */
@@ -170,9 +158,9 @@ header {
 
 /* Sidebar Campaign Selector */
 aside.campaign-sidebar {
-  width: 440px;
+  width: 400px;
   background-color: var(--bg-secondary);
-  border-right: 2px solid var(--border-default);
+  border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
   padding: 15px 0;
@@ -181,10 +169,9 @@ aside.campaign-sidebar {
 .sidebar-title {
   padding: 0 15px 10px 15px;
   font-size: 11px;
-  text-transform: uppercase;
-  color: var(--text-primary);
+  color: var(--text-muted);
   font-weight: 700;
-  border-bottom: 2px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .levels-table-container {
@@ -206,18 +193,12 @@ aside.campaign-sidebar {
   text-align: left;
   vertical-align: middle;
   border-bottom: 1px solid var(--border-default);
-  border-right: 1px solid var(--border-default);
-}
-
-#levels-table th:last-child, #levels-table td:last-child {
-  border-right: none;
 }
 
 #levels-table th {
   font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-primary);
-  border-bottom: 2px solid var(--border-default);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-default);
   background-color: var(--bg-secondary);
   position: sticky;
   top: 0;
@@ -225,7 +206,7 @@ aside.campaign-sidebar {
 }
 
 .col-topic { width: 130px; }
-.col-subtopics { width: 250px; }
+.col-subtopics { width: 220px; }
 .col-status { width: 60px; }
 
 .level-row {
@@ -262,19 +243,19 @@ aside.campaign-sidebar {
   display: inline-block;
   cursor: pointer;
   color: var(--text-secondary);
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-primary);
   border: 1px solid var(--border-default);
-  padding: 2px 5px;
+  padding: 2px 6px;
   font-size: 9.5px;
   font-weight: 500;
-  transition: all 0.05s ease;
-  line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+  line-height: 1.4;
 }
 
 .subtopic-badge:hover {
   color: var(--text-primary);
-  border-color: var(--text-primary);
-  background-color: var(--bg-primary);
+  border-color: var(--text-secondary);
 }
 
 .active-subtopic {
@@ -286,7 +267,7 @@ aside.campaign-sidebar {
 
 .cell-status {
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-align: center !important;
   font-size: 11px;
 }
@@ -297,7 +278,7 @@ aside.campaign-sidebar {
 
 .sidebar-footer {
   padding: 15px;
-  border-top: 2px solid var(--border-default);
+  border-top: 1px solid var(--border-default);
 }
 
 /* Game Board Area */
@@ -322,12 +303,12 @@ main.game-board {
 /* Editor Panel (Left) */
 .editor-panel {
   background-color: var(--bg-darker);
-  border: 2px solid var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  border-radius: 0;
 }
 
 .editor-panel.pulse-success {
@@ -336,37 +317,25 @@ main.game-board {
 
 @keyframes successFlash {
   0% { background-color: var(--bg-darker); }
-  50% { background-color: #e0ffe0; }
+  50% { background-color: #e6f7ea; }
   100% { background-color: var(--bg-darker); }
 }
 
 .editor-header {
-  height: 35px;
+  height: 34px;
   background-color: var(--bg-secondary);
-  border-bottom: 2px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
 }
 
-.editor-dots {
-  display: flex;
-  gap: 4px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border: 1px solid var(--border-default);
-  background-color: var(--bg-tertiary);
-}
-
 .editor-title {
   font-family: var(--font-code);
   font-size: 11px;
-  color: var(--text-primary);
-  font-weight: 700;
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .editor-options {
@@ -375,7 +344,7 @@ main.game-board {
   gap: 5px;
   font-size: 11px;
   color: var(--text-secondary);
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .editor-options input {
@@ -400,7 +369,7 @@ main.game-board {
 }
 
 .editor-line.active-line {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(0, 0, 0, 0.025);
 }
 
 .line-number {
@@ -445,20 +414,19 @@ main.game-board {
   to { background-color: transparent; color: inherit; border-color: transparent; }
 }
 
-/* Target character highlight: High-contrast box */
+/* Target character highlight */
 .char-target {
   border: 1px solid var(--accent-red);
-  background-color: #ffebe9;
+  background-color: #fbeaea;
   color: var(--accent-red) !important;
   font-weight: 700;
-  box-shadow: 1px 1px 0px var(--accent-red);
+  border-radius: 2px;
 }
 
 .char-selected {
   background-color: var(--bg-tertiary) !important;
   color: var(--text-primary) !important;
 }
-
 
 /* Code Syntax Colors */
 .syntax-default { color: var(--text-primary); }
@@ -467,11 +435,11 @@ main.game-board {
 .syntax-comment { color: var(--text-muted); font-style: italic; }
 .syntax-number { color: var(--accent-cyan); }
 
-/* Neovim Status Line (Terminal Monochrome style) */
+/* Neovim Status Line */
 .editor-statusline {
-  height: 25px;
+  height: 24px;
   background-color: var(--bg-secondary);
-  border-top: 2px solid var(--border-default);
+  border-top: 1px solid var(--border-default);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -491,7 +459,6 @@ main.game-board {
   display: flex;
   align-items: center;
   font-weight: 700;
-  border-right: 1px solid var(--border-default);
 }
 
 .status-mode.mode-normal {
@@ -506,8 +473,8 @@ main.game-board {
 
 .status-filename {
   padding: 0 10px;
-  color: var(--text-primary);
-  font-weight: bold;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .status-keys {
@@ -529,12 +496,11 @@ main.game-board {
 .status-pos {
   padding: 0 10px;
   border-left: 1px solid var(--border-default);
-  background-color: var(--bg-tertiary);
   height: 100%;
   display: flex;
   align-items: center;
-  color: var(--text-primary);
-  font-weight: bold;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 /* Instruction & Guide Panel (Right) */
@@ -546,18 +512,17 @@ main.game-board {
 
 .instruction-card {
   background-color: var(--bg-secondary);
-  border: 2px solid var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border-radius: 0;
 }
 
 .step-badge {
   font-size: 10px;
   color: var(--text-muted);
-  text-transform: uppercase;
   font-weight: 700;
 }
 
@@ -569,17 +534,6 @@ main.game-board {
 
 .instructions-text strong {
   color: var(--text-primary);
-}
-
-.instructions-text .key-cap {
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-default);
-  border-bottom: 2px solid var(--border-default);
-  padding: 1px 5px;
-  font-family: var(--font-code);
-  font-size: 11px;
-  color: var(--text-primary);
-  font-weight: 700;
 }
 
 .instruction-actions {
@@ -605,7 +559,8 @@ main.game-board {
   font-family: var(--font-code);
   background-color: var(--bg-tertiary);
   border: 1px solid var(--border-default);
-  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
   color: var(--accent-pink);
   font-weight: 700;
 }
@@ -613,53 +568,43 @@ main.game-board {
 /* Split Keyboard Tip Panel */
 .split-tip-card {
   background-color: var(--bg-secondary);
-  border: 1px dashed var(--border-default);
-  padding: 10px 15px;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  border-radius: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  padding: 12px 15px;
 }
 
-.tip-icon {
-  font-size: 15px;
-  line-height: 1.2;
-}
-
-.tip-content h4 {
+.split-tip-card h4 {
   font-size: 11px;
-  text-transform: uppercase;
   color: var(--text-primary);
-  margin-bottom: 1px;
+  margin-bottom: 4px;
   font-weight: 700;
 }
 
-.tip-content p {
-  font-size: 11px;
+.split-tip-card p {
+  font-size: 11.5px;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
-/* Keyboard Visualizer Section (Flat Box Layout) */
+/* Keyboard Visualizer Section */
 .keyboard-section {
   background-color: var(--bg-secondary);
-  border: 2px solid var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
   padding: 15px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border-radius: 0;
 }
 
 .keyboard-title {
   font-size: 11px;
-  text-transform: uppercase;
-  color: var(--text-primary);
-  font-weight: 700;
+  color: var(--text-secondary);
+  font-weight: 600;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px dashed var(--border-default);
-  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-default);
+  padding-bottom: 8px;
 }
 
 .keyboard-split-wrapper {
@@ -677,26 +622,24 @@ main.game-board {
   align-items: center;
 }
 
-/* Minimal Flat Keyboard Row */
 .keyboard-row {
   display: flex;
   gap: 5px;
   justify-content: center;
 }
 
-/* Keycap Styling: Flat box */
+/* Keycap Styling: flat, thin border */
 .key-btn {
   width: 32px;
   height: 32px;
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-default);
-  border-bottom: 2px solid var(--border-default);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: all 0.05s ease;
-  border-radius: 0;
+  transition: all 0.08s ease;
 }
 
 .key-btn span {
@@ -719,19 +662,19 @@ main.game-board {
 .homing-bump {
   width: 8px;
   height: 1.5px;
-  background-color: var(--border-default);
+  background-color: var(--text-muted);
   position: absolute;
   bottom: 6px;
 }
 
-/* Active Highlight: bold borders */
+/* Active Highlight */
 .key-btn.key-active {
-  border-color: var(--text-primary);
-  border-width: 1.5px;
+  border-color: var(--accent-cyan);
+  background-color: #eaf3fa;
 }
 
 .key-btn.key-active span {
-  color: var(--text-primary);
+  color: var(--accent-cyan);
   font-weight: bold;
 }
 
@@ -752,7 +695,7 @@ main.game-board {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(240, 240, 240, 0.9);
+  background-color: rgba(20, 20, 22, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -762,23 +705,23 @@ main.game-board {
 .win-card {
   width: 380px;
   background-color: var(--bg-secondary);
-  border: 3px solid var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
   padding: 30px;
   text-align: center;
-  box-shadow: 6px 6px 0px var(--border-default);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 15px;
-  border-radius: 0;
 }
 
 .trophy-icon {
-  font-size: 36px;
+  font-size: 32px;
 }
 
 .win-card h2 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -798,6 +741,7 @@ main.game-board {
 .win-stats {
   width: 100%;
   border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
   background-color: var(--bg-primary);
   padding: 10px;
   font-size: 12px;
@@ -829,7 +773,7 @@ main.game-board {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(20, 20, 22, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -841,32 +785,36 @@ main.game-board {
   max-width: 800px;
   max-height: 85vh;
   background-color: var(--bg-secondary);
-  border: 3px solid var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 6px 6px 0px var(--border-default);
-  border-radius: 0;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
 }
 
 .modal-header {
   padding: 15px 20px;
-  border-bottom: 2px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .modal-header h2 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .close-btn {
-  font-size: 24px;
-  color: var(--text-primary);
+  font-size: 22px;
+  color: var(--text-muted);
   cursor: pointer;
   font-weight: bold;
+}
+
+.close-btn:hover {
+  color: var(--text-primary);
 }
 
 .modal-body {
@@ -877,24 +825,23 @@ main.game-board {
 .levels-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 15px;
+  gap: 12px;
 }
 
 .level-card {
   background-color: var(--bg-secondary);
-  border: 2px solid var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
   padding: 15px;
   cursor: pointer;
   transition: var(--transition-fast);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-radius: 0;
 }
 
 .level-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0px var(--border-default);
+  border-color: var(--text-secondary);
 }
 
 .level-card.active {
@@ -902,19 +849,17 @@ main.game-board {
 }
 
 .level-card.completed {
-  border-style: double; /* distinct retro border */
-  border-width: 3px;
+  border-color: var(--accent-green);
 }
 
 .level-card-status {
   font-size: 10px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-weight: 700;
 }
 
 .level-card.completed .level-card-status {
-  color: var(--text-primary);
+  color: var(--accent-green);
 }
 
 .level-card h3 {
@@ -931,23 +876,40 @@ main.game-board {
 
 /* Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
-  border: 1px solid var(--border-default);
 }
 
 /* ==========================================================================
-   Cheatsheet Redesign: header modes, tabs, search, category nav, shortcut
-   cards, plugin cards, and the shared keyboard panel.
+   Cheatsheet: header modes, tabs, search, category nav, shortcut cards,
+   plugin cards, and the shared keyboard panel.
    ========================================================================== */
+
+/* A key-cap chip — used in instructions, shortcut cards, and the prefix banner */
+.key-cap {
+  display: inline-block;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
 
 /* Header mode blocks (cheatsheet controls vs practice stats) share the
    middle flex slot between the logo and the practice-mode toggle button */
@@ -965,24 +927,25 @@ main.game-board {
   flex-shrink: 0;
 }
 
-/* Tool Tabs */
+/* Tool Tabs: minimal underline style */
 .tool-tabs {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
 .tool-tab {
-  background-color: var(--bg-secondary);
-  border: 2px solid var(--border-default);
-  color: var(--text-secondary);
-  padding: 6px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: 7px 4px;
+  margin: 0 8px;
   cursor: pointer;
   font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 600;
   transition: var(--transition-fast);
-  border-radius: 0;
 }
 
 .tool-tab:hover {
@@ -990,22 +953,21 @@ main.game-board {
 }
 
 .tool-tab.active {
-  background-color: var(--text-primary);
-  color: var(--bg-secondary);
-  border-color: var(--text-primary);
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-cyan);
 }
 
 /* Search Bar */
 .search-bar {
   flex: 1;
-  max-width: 340px;
+  max-width: 320px;
   background-color: var(--bg-primary);
-  border: 2px solid var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
   color: var(--text-primary);
   padding: 7px 10px;
   font-family: var(--font-code);
   font-size: 12px;
-  border-radius: 0;
 }
 
 .search-bar:focus {
@@ -1026,39 +988,39 @@ main.game-board {
 
 /* Category Sidebar (Cheatsheet View) */
 .category-sidebar {
-  width: 210px;
+  width: 200px;
   flex-shrink: 0;
   background-color: var(--bg-secondary);
-  border-right: 2px solid var(--border-default);
+  border-right: 1px solid var(--border-default);
   padding: 15px 0;
   overflow-y: auto;
 }
 
 .category-nav-item {
-  padding: 9px 18px;
+  padding: 8px 18px;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
-  border-left: 3px solid transparent;
+  border-left: 2px solid transparent;
   transition: var(--transition-fast);
 }
 
 .category-nav-item:hover {
   color: var(--text-primary);
-  background-color: var(--bg-primary);
 }
 
 .category-nav-item.active {
   color: var(--text-primary);
+  font-weight: 700;
   border-left-color: var(--accent-cyan);
   background-color: var(--bg-primary);
 }
 
 .category-nav-plugins {
-  margin-top: 12px;
-  border-top: 1px dashed var(--border-default);
-  padding-top: 18px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border-default);
+  padding-top: 16px;
 }
 
 /* Cheatsheet Board */
@@ -1068,19 +1030,19 @@ main.game-board {
   padding: 24px 30px 40px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
   background-color: var(--bg-primary);
 }
 
 .tool-tagline {
   font-size: 13px;
   color: var(--text-secondary);
-  font-style: italic;
 }
 
 .prefix-banner {
   background-color: var(--bg-secondary);
-  border: 1px dashed var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
   padding: 10px 15px;
   font-size: 12px;
   color: var(--text-secondary);
@@ -1096,7 +1058,7 @@ main.game-board {
 .shortcut-category {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   scroll-margin-top: 10px;
 }
 
@@ -1105,29 +1067,29 @@ main.game-board {
 }
 
 .category-heading {
-  font-size: 12.5px;
-  text-transform: uppercase;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text-primary);
-  border-bottom: 2px solid var(--border-default);
-  padding-bottom: 6px;
+  padding-bottom: 4px;
 }
 
 .shortcut-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 10px;
+  gap: 1px;
+  background-color: var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
 
 .shortcut-card {
   background-color: var(--bg-secondary);
-  border: 1px solid var(--border-default);
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   transition: var(--transition-fast);
-  border-radius: 0;
 }
 
 .shortcut-card.search-hidden {
@@ -1135,9 +1097,7 @@ main.game-board {
 }
 
 .shortcut-card:hover {
-  border-color: var(--text-primary);
-  transform: translate(-1px, -1px);
-  box-shadow: 2px 2px 0px var(--border-default);
+  background-color: var(--bg-tertiary);
 }
 
 .shortcut-keys {
@@ -1158,6 +1118,7 @@ main.game-board {
   font-size: 11px;
   background-color: var(--bg-tertiary);
   border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
   padding: 2px 6px;
   color: var(--accent-pink);
 }
@@ -1170,9 +1131,9 @@ main.game-board {
 
 /* Plugins Section & Cards */
 .plugins-section {
-  margin-top: 6px;
+  margin-top: 4px;
   padding-top: 22px;
-  border-top: 2px solid var(--border-default);
+  border-top: 1px solid var(--border-default);
   scroll-margin-top: 10px;
 }
 
@@ -1181,8 +1142,7 @@ main.game-board {
 }
 
 .section-heading {
-  font-size: 14px;
-  text-transform: uppercase;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 14px;
@@ -1191,12 +1151,13 @@ main.game-board {
 .plugins-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 15px;
+  gap: 12px;
 }
 
 .plugin-card {
   background-color: var(--bg-secondary);
-  border: 2px solid var(--border-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
   padding: 15px;
   display: flex;
   flex-direction: column;
@@ -1204,7 +1165,6 @@ main.game-board {
   text-decoration: none;
   color: inherit;
   transition: var(--transition-fast);
-  border-radius: 0;
 }
 
 .plugin-card.search-hidden {
@@ -1212,8 +1172,7 @@ main.game-board {
 }
 
 .plugin-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0px var(--border-default);
+  border-color: var(--text-secondary);
 }
 
 .plugin-card h3 {
@@ -1248,10 +1207,10 @@ main.game-board {
 
 /* Shared Keyboard Panel (persistent across cheatsheet + practice views) */
 .keyboard-panel {
-  width: 300px;
+  width: 290px;
   flex-shrink: 0;
   background-color: var(--bg-secondary);
-  border-left: 2px solid var(--border-default);
+  border-left: 1px solid var(--border-default);
   padding: 15px;
   overflow-y: auto;
 }
@@ -1262,7 +1221,6 @@ main.game-board {
 }
 
 #keyboard-context-label {
-  text-transform: none;
   font-size: 11px;
 }
 
@@ -1271,7 +1229,7 @@ main.game-board {
   height: 26px;
   flex-shrink: 0;
   background-color: var(--bg-secondary);
-  border-top: 2px solid var(--border-default);
+  border-top: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1279,7 +1237,6 @@ main.game-board {
   font-size: 10px;
   color: var(--text-muted);
   font-family: var(--font-code);
-  letter-spacing: 0.3px;
 }
 
 .app-footer-version {

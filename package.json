@@ -1,6 +1,6 @@
 {
   "name": "terminal-ide-cheatsheet",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A searchable cheatsheet for Neovim, tmux, and lazygit shortcuts and curated plugins, with an interactive keyboard preview and a Vim motions practice drill.",
   "main": "server.js",
   "scripts": {
