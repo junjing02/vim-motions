@@ -2,7 +2,7 @@
 // Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.2.0";
+const APP_VERSION = "2.3.0";
 
 let currentTool = "neovim";
 
@@ -25,6 +25,8 @@ function renderTool(toolId) {
   } else {
     banner.style.display = "none";
   }
+
+  document.getElementById("plugins-section-heading").textContent = tool.pluginsLabel || "Recommended Plugins";
 
   renderCategoryNav(tool);
   renderShortcutSections(tool);
@@ -57,7 +59,7 @@ function renderCategoryNav(tool) {
 
   const pluginsNavItem = document.createElement("div");
   pluginsNavItem.className = "category-nav-item category-nav-plugins";
-  pluginsNavItem.textContent = "Recommended Plugins";
+  pluginsNavItem.textContent = tool.pluginsLabel || "Recommended Plugins";
   pluginsNavItem.addEventListener("click", () => {
     document.querySelectorAll(".category-nav-item").forEach(el => el.classList.remove("active"));
     pluginsNavItem.classList.add("active");

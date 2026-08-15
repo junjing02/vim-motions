@@ -297,5 +297,77 @@ const CHEATSHEETS = {
       { name: "Nerd Font", tagline: "Install a Nerd Font and enable icons in lazygit's config for file-type and git-status glyphs instead of plain text.", url: "https://www.nerdfonts.com/" },
       { name: "toggleterm.nvim / lazygit.nvim", tagline: "Open lazygit in a floating terminal right inside Neovim so you never leave your editor to commit.", url: "https://github.com/akinsho/toggleterm.nvim" }
     ]
+  },
+
+  corne: {
+    id: "corne",
+    name: "Corne 42",
+    tagline: "A 42-key split keyboard — 3×6 per hand plus 3 thumb keys. Layers do the work a number row and function keys would on a full-size board.",
+    prefixKey: null,
+    pluginsLabel: "Firmware & Layout Resources",
+    categories: [
+      {
+        id: "basics",
+        title: "Layout Basics",
+        shortcuts: [
+          { keys: ["42 keys"], desc: "3 rows × 6 columns per hand (36 keys) plus 3 thumb keys per hand (6 keys). No number row, no arrow keys, no function row — they all live on layers." },
+          { keys: ["Columnar stagger"], desc: "Each column is offset vertically to match finger length, unlike a row-staggered board. Expect a short adjustment period, especially for the pinky columns." },
+          { keys: ["Thumb cluster"], desc: "3 keys per thumb usually carry Space, Backspace/Enter, and a layer key — thumbs do far more work than on a standard keyboard." },
+          { keys: ["36 vs 42"], desc: "Some Corne users disable the outer pinky column and run it as a 36-key board instead — a common way to simplify further once you're comfortable." }
+        ]
+      },
+      {
+        id: "layers",
+        title: "Layers",
+        shortcuts: [
+          { keys: ["Layer 0"], desc: "Base layer — usually QWERTY or Colemak. Always the fallback layer." },
+          { keys: ["Lower"], desc: "Common second layer: numbers, symbols, and the function row. Held from a thumb key." },
+          { keys: ["Raise"], desc: "Common third layer: navigation (arrows, page up/down), media keys, mouse keys. Held from another thumb key." },
+          { keys: ["Adjust"], desc: "Often reached by holding Lower + Raise together: firmware settings, RGB, bootloader/reset." }
+        ]
+      },
+      {
+        id: "qmk-keycodes",
+        title: "QMK Layer Keycodes",
+        shortcuts: [
+          { keys: ["MO(layer)"], desc: "Momentary — the layer is active only while the key is held." },
+          { keys: ["LT(layer, kc)"], desc: "Layer-tap — tap sends kc, hold activates the layer. Common on thumb keys, e.g. LT(1, KC_SPC)." },
+          { keys: ["TG(layer)"], desc: "Toggle — press once to turn the layer on, press again (from that layer) to turn it off." },
+          { keys: ["TO(layer)"], desc: "Activates one layer and turns off every other layer except the default." },
+          { keys: ["TT(layer)"], desc: "Tap-toggle — hold for momentary access, or tap repeatedly to toggle it on." },
+          { keys: ["DF(layer)"], desc: "Sets the default (base) layer — used to switch between e.g. QWERTY and Colemak." },
+          { keys: ["OSL(layer)"], desc: "One-shot layer — only the very next keypress comes from that layer, then it reverts." }
+        ]
+      },
+      {
+        id: "zmk-behaviors",
+        title: "ZMK Behaviors",
+        shortcuts: [
+          { keys: ["&mo"], desc: "Momentary layer — mirrors QMK's MO(), active only while held. Common on wireless Corne builds." },
+          { keys: ["&lt"], desc: "Layer-tap — tap for a keycode, hold for a layer. Mirrors QMK's LT()." },
+          { keys: ["&tog"], desc: "Toggles a layer on/off. Mirrors QMK's TG()." },
+          { keys: ["&to"], desc: "Activates one layer and disables every other layer except the default." },
+          { keys: ["&sk / &sl"], desc: "Sticky key / sticky layer — like a one-shot modifier or layer for just the next keypress." }
+        ]
+      },
+      {
+        id: "home-row-mods",
+        title: "Home Row Mods",
+        shortcuts: [
+          { keys: ["A S D F"], desc: "Common left-hand assignment: GUI, Alt, Ctrl, Shift when held — tap for the normal letter." },
+          { keys: ["J K L ;"], desc: "Mirrored on the right hand: Shift, Ctrl, Alt, GUI when held." },
+          { keys: ["Tapping term"], desc: "The hold-vs-tap timing threshold (usually 150–200ms). Tune this first if letters misfire as modifiers." },
+          { keys: ["Permissive hold"], desc: "A QMK/ZMK setting that reduces accidental mod-taps by requiring another key to be pressed before a hold is treated as a modifier." }
+        ]
+      }
+    ],
+    plugins: [
+      { name: "QMK Firmware", tagline: "The most widely supported open-source keyboard firmware — huge community, extensive docs, works over USB.", url: "https://qmk.fm" },
+      { name: "ZMK Firmware", tagline: "Modern firmware built for wireless (Bluetooth) split keyboards — the usual pick if your Corne is wireless.", url: "https://zmk.dev" },
+      { name: "VIA / Vial", tagline: "Point-and-click keymap editor for QMK-compatible boards — no recompiling firmware just to remap a key.", url: "https://www.caniusevia.com/" },
+      { name: "Miryoku", tagline: "A popular, minimalist layout system built around home row mods — a great reference to start from rather than designing your own from scratch.", url: "https://github.com/manna-harbour/miryoku" },
+      { name: "keymap-drawer", tagline: "Generates a clean visual diagram of your keymap straight from your QMK/ZMK config — makes memorizing your own layout much easier.", url: "https://github.com/caksoylar/keymap-drawer" },
+      { name: "r/ErgoMechKeyboards", tagline: "The main community hub for split/ergo keyboard builds, layout advice, and troubleshooting.", url: "https://www.reddit.com/r/ErgoMechKeyboards/" }
+    ]
   }
 };

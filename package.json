@@ -1,7 +1,7 @@
 {
   "name": "terminal-ide-cheatsheet",
-  "version": "2.2.0",
-  "description": "A searchable, mobile-friendly cheatsheet for Neovim, tmux, and lazygit shortcuts and curated plugins, with a Vim motions practice drill.",
+  "version": "2.3.0",
+  "description": "A searchable, mobile-friendly cheatsheet for Neovim, tmux, lazygit, and the Corne 42 split keyboard, with curated resources and a Vim motions practice drill.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -14,7 +14,11 @@
     "lazygit",
     "cheatsheet",
     "terminal",
-    "shortcuts"
+    "shortcuts",
+    "corne",
+    "split-keyboard",
+    "qmk",
+    "zmk"
   ],
   "author": "Antigravity",
   "license": "MIT"
