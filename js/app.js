@@ -3,7 +3,7 @@
 // during the Neovim motions drill).
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.1.0";
+const APP_VERSION = "2.1.1";
 
 let currentTool = "neovim";
 

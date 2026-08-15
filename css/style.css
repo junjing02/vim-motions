@@ -607,12 +607,13 @@ main.game-board {
   padding-bottom: 8px;
 }
 
+/* Stacked (not side-by-side): a 7-key row needs ~254px on its own, which a narrow
+   side panel can't fit twice across. Stacking keeps every key on screen. */
 .keyboard-split-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   padding: 5px 0;
-  justify-content: center;
 }
 
 .keyboard-half {
@@ -678,10 +679,11 @@ main.game-board {
   font-weight: bold;
 }
 
-/* Pressed Animation: inverted color */
+/* Pressed feedback: a distinct color from the blue "active/guidance" highlight above,
+   so "you just pressed this" reads differently from "this is the key to press" */
 .key-btn.key-pressed {
-  background-color: var(--text-primary);
-  border-color: var(--text-primary);
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
 }
 
 .key-btn.key-pressed span {
@@ -986,14 +988,10 @@ main.game-board {
   overflow: hidden;
 }
 
-/* Category Sidebar (Cheatsheet View) */
+/* Category Sidebar (Cheatsheet View) — hidden for now; category headings in the
+   main content plus search cover navigation without the extra panel. */
 .category-sidebar {
-  width: 200px;
-  flex-shrink: 0;
-  background-color: var(--bg-secondary);
-  border-right: 1px solid var(--border-default);
-  padding: 15px 0;
-  overflow-y: auto;
+  display: none;
 }
 
 .category-nav-item {
@@ -1032,6 +1030,13 @@ main.game-board {
   flex-direction: column;
   gap: 24px;
   background-color: var(--bg-primary);
+}
+
+/* Each category (subtopic) section needs clear separation from the next */
+#shortcut-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
 }
 
 .tool-tagline {
@@ -1205,9 +1210,10 @@ main.game-board {
   display: none;
 }
 
-/* Shared Keyboard Panel (persistent across cheatsheet + practice views) */
+/* Shared Keyboard Panel (persistent across cheatsheet + practice views).
+   320px is the minimum to fit the widest key row (7 keys) without clipping. */
 .keyboard-panel {
-  width: 290px;
+  width: 320px;
   flex-shrink: 0;
   background-color: var(--bg-secondary);
   border-left: 1px solid var(--border-default);
@@ -1252,9 +1258,6 @@ main.game-board {
 }
 
 @media (max-width: 700px) {
-  .category-sidebar {
-    width: 150px;
-  }
   .shortcut-list {
     grid-template-columns: 1fr;
   }
