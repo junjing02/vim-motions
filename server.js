@@ -18,8 +18,10 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  // Decode URL to handle spaces or special characters
-  const decodedUrl = decodeURIComponent(req.url);
+  // Strip the query string (e.g. cache-busting ?v=...) before resolving a file path,
+  // then decode URL to handle spaces or special characters
+  const urlPath = req.url.split('?')[0];
+  const decodedUrl = decodeURIComponent(urlPath);
   let filePath = path.join(__dirname, decodedUrl === '/' ? 'index.html' : decodedUrl);
 
   // Safety check: ensure file path stays within current directory to prevent directory traversal
@@ -45,7 +47,8 @@ const server = http.createServer((req, res) => {
         res.end(`<h1>500 Internal Server Error</h1><p>Error code: ${error.code}</p>`, 'utf-8');
       }
     } else {
-      res.writeHead(200, { 'Content-Type': contentType });
+      // Local dev server: never cache, so a normal refresh always reflects the current files
+      res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': 'no-cache' });
       res.end(content, 'utf-8');
     }
   });
@@ -53,7 +56,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n==================================================`);
-  console.log(`   VIM NINJA GAME DEV SERVER RUNNING`);
+  console.log(`   TERMINAL IDE CHEATSHEET DEV SERVER RUNNING`);
   console.log(`   URL: http://localhost:${PORT}/`);
   console.log(`==================================================\n`);
 });
