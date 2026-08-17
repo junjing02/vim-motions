@@ -305,51 +305,126 @@ const CHEATSHEETS = {
     tagline: "A 42-key split keyboard — 3×6 per hand plus 3 thumb keys. Layers do the work a number row and function keys would on a full-size board.",
     prefixKey: null,
     pluginsLabel: "Firmware & Layout Resources",
-    // One illustrative beginner layout, not a universal standard — Corne configs vary widely.
-    // "·" marks a transparent key (falls through to the base layer). Thumbs stay constant
-    // across layers since the layer-access keys themselves don't usually change.
-    keyboardLayout: {
-      note: "One example layout to learn the concepts from — real Corne configs vary a lot. \"·\" means the key is transparent (falls through to Base).",
-      thumbs: ["GUI", "Lower", "Space", "Enter", "Raise", "Alt"],
-      layers: [
-        {
-          id: "base",
-          label: "Base",
-          rows: [
-            ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Bspc"],
-            ["Esc", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'"],
-            ["Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift"]
-          ]
-        },
-        {
-          id: "lower",
-          label: "Lower",
-          rows: [
-            ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "Del"],
-            ["·", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "·"],
-            ["·", "-", "=", "[", "]", "\\", "_", "+", "{", "}", "|", "·"]
-          ]
-        },
-        {
-          id: "raise",
-          label: "Raise",
-          rows: [
-            ["·", "·", "·", "·", "·", "·", "·", "Home", "PgDn", "PgUp", "End", "·"],
-            ["·", "·", "·", "·", "·", "·", "·", "Left", "Down", "Up", "Right", "·"],
-            ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·"]
-          ]
-        },
-        {
-          id: "adjust",
-          label: "Adjust",
-          rows: [
-            ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "BOOT"],
-            ["·", "·", "·", "·", "·", "RGB", "·", "·", "·", "·", "·", "·"],
-            ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·"]
-          ]
-        }
-      ]
-    },
+    // Illustrative layouts, not universal standards — real Corne configs vary widely.
+    // "·" marks a transparent key (falls through to Base). Thumbs stay constant across
+    // layers within a layout since the layer-access keys themselves don't usually change.
+    keyboardLayouts: [
+      {
+        id: "default",
+        name: "Default (Beginner QWERTY)",
+        note: "One example layout to learn the concepts from — real Corne configs vary a lot. \"·\" means the key is transparent (falls through to Base).",
+        thumbs: ["GUI", "Lower", "Space", "Enter", "Raise", "Alt"],
+        layers: [
+          {
+            id: "base",
+            label: "Base",
+            rows: [
+              ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Bspc"],
+              ["Esc", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'"],
+              ["Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift"]
+            ]
+          },
+          {
+            id: "lower",
+            label: "Lower",
+            rows: [
+              ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "Del"],
+              ["·", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "·"],
+              ["·", "-", "=", "[", "]", "\\", "_", "+", "{", "}", "|", "·"]
+            ]
+          },
+          {
+            id: "raise",
+            label: "Raise",
+            rows: [
+              ["·", "·", "·", "·", "·", "·", "·", "Home", "PgDn", "PgUp", "End", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "Left", "Down", "Up", "Right", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·"]
+            ]
+          },
+          {
+            id: "adjust",
+            label: "Adjust",
+            rows: [
+              ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "BOOT"],
+              ["·", "·", "·", "·", "·", "RGB", "·", "·", "·", "·", "·", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·", "·"]
+            ]
+          }
+        ]
+      },
+      {
+        id: "miryoku",
+        name: "Miryoku (Colemak-DH)",
+        note: "A faithful-but-simplified rendition of Miryoku's design: Colemak-DH alphas, mirrored home row mods (tap the letter, hold for the modifier shown), and the same layer set (Nav/Mouse/Media/Num/Sym/Fun) it ships with. Miryoku's core is a 36-key (5-column) layout, so the outer column is unused here — see miryoku.org for the pixel-exact reference.",
+        thumbs: ["Esc", "Tab", "Space", "Enter", "Bspc", "Del"],
+        layers: [
+          {
+            id: "base",
+            label: "Base",
+            rows: [
+              ["·", "Q", "W", "F", "P", "B", "J", "L", "U", "Y", ";", "·"],
+              ["·", "A/Gui", "R/Alt", "S/Ctrl", "T/Shift", "G", "M", "N/Shift", "E/Ctrl", "I/Alt", "O/Gui", "·"],
+              ["·", "Z", "X", "C", "D", "V", "K", "H", ",", ".", "/", "·"]
+            ]
+          },
+          {
+            id: "nav",
+            label: "Nav",
+            rows: [
+              ["·", "·", "·", "·", "·", "·", "·", "Undo", "Cut", "Copy", "Paste", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "Left", "Down", "Up", "Right", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "Home", "PgDn", "PgUp", "End", "·"]
+            ]
+          },
+          {
+            id: "mouse",
+            label: "Mouse",
+            rows: [
+              ["·", "·", "·", "·", "·", "·", "·", "BtnL", "BtnM", "BtnR", "·", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "MLeft", "MDown", "MUp", "MRight", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "WheelL", "WheelD", "WheelU", "WheelR", "·"]
+            ]
+          },
+          {
+            id: "media",
+            label: "Media",
+            rows: [
+              ["·", "·", "·", "·", "·", "·", "·", "BT1", "BT2", "BT3", "·", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "RGB Tog", "RGB Mode", "Hue", "Sat", "·"],
+              ["·", "·", "·", "·", "·", "·", "·", "Prev", "Vol−", "Vol+", "Next", "·"]
+            ]
+          },
+          {
+            id: "num",
+            label: "Num",
+            rows: [
+              ["·", "/", "7", "8", "9", "*", "·", "·", "·", "·", "·", "·"],
+              ["·", "0", "4", "5", "6", "-", "·", "·", "·", "·", "·", "·"],
+              ["·", ".", "1", "2", "3", "=", "·", "·", "·", "·", "·", "·"]
+            ]
+          },
+          {
+            id: "sym",
+            label: "Sym",
+            rows: [
+              ["·", "?", "&", "*", "(", ")", "·", "·", "·", "·", "·", "·"],
+              ["·", ")", "$", "%", "^", "_", "·", "·", "·", "·", "·", "·"],
+              ["·", ">", "!", "@", "#", "+", "·", "·", "·", "·", "·", "·"]
+            ]
+          },
+          {
+            id: "fun",
+            label: "Fun",
+            rows: [
+              ["·", "F12", "F7", "F8", "F9", "·", "·", "·", "·", "·", "·", "·"],
+              ["·", "F11", "F4", "F5", "F6", "·", "·", "·", "·", "·", "·", "·"],
+              ["·", "F10", "F1", "F2", "F3", "·", "·", "·", "·", "·", "·", "·"]
+            ]
+          }
+        ]
+      }
+    ],
     categories: [
       {
         id: "basics",

@@ -2,7 +2,7 @@
 // Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.4.1";
+const APP_VERSION = "2.5.0";
 
 let currentTool = "neovim";
 
@@ -29,9 +29,9 @@ function renderTool(toolId) {
   document.getElementById("plugins-section-heading").textContent = tool.pluginsLabel || "Recommended Plugins";
 
   const keyboardSection = document.getElementById("corne-keyboard-section");
-  if (tool.keyboardLayout) {
+  if (tool.keyboardLayouts) {
     keyboardSection.style.display = "block";
-    renderCorneKeyboard(tool.keyboardLayout);
+    renderCorneLayoutTabs(tool.keyboardLayouts);
   } else {
     keyboardSection.style.display = "none";
   }
@@ -49,6 +49,25 @@ function renderTool(toolId) {
 }
 
 // --- Corne 42 keyboard layer viewer ---
+
+function renderCorneLayoutTabs(layouts) {
+  const layoutTabsEl = document.getElementById("corne-layout-tabs");
+  layoutTabsEl.innerHTML = "";
+
+  layouts.forEach((layout, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "corne-layout-tab" + (idx === 0 ? " active" : "");
+    btn.textContent = layout.name;
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".corne-layout-tab").forEach(el => el.classList.remove("active"));
+      btn.classList.add("active");
+      renderCorneKeyboard(layout);
+    });
+    layoutTabsEl.appendChild(btn);
+  });
+
+  renderCorneKeyboard(layouts[0]);
+}
 
 function renderCorneKeyboard(layout) {
   const tabsEl = document.getElementById("corne-layer-tabs");
