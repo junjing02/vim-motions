@@ -304,7 +304,7 @@ const CHEATSHEETS = {
     name: "Corne 42",
     tagline: "A 42-key split keyboard — 3×6 per hand plus 3 thumb keys. Layers do the work a number row and function keys would on a full-size board.",
     prefixKey: null,
-    pluginsLabel: "Firmware & Layout Resources",
+    pluginsLabel: "Vial & Layout Resources",
     // Illustrative layouts, not universal standards — real Corne configs vary widely.
     // "·" marks a transparent key (falls through to Base). Thumbs stay constant across
     // layers within a layout since the layer-access keys themselves don't usually change.
@@ -460,14 +460,17 @@ const CHEATSHEETS = {
         ]
       },
       {
-        id: "zmk-behaviors",
-        title: "ZMK Behaviors",
+        id: "vial-features",
+        title: "Vial Features",
         shortcuts: [
-          { keys: ["&mo"], desc: "Momentary layer — mirrors QMK's MO(), active only while held. Common on wireless Corne builds." },
-          { keys: ["&lt"], desc: "Layer-tap — tap for a keycode, hold for a layer. Mirrors QMK's LT()." },
-          { keys: ["&tog"], desc: "Toggles a layer on/off. Mirrors QMK's TG()." },
-          { keys: ["&to"], desc: "Activates one layer and disables every other layer except the default." },
-          { keys: ["&sk / &sl"], desc: "Sticky key / sticky layer — like a one-shot modifier or layer for just the next keypress." }
+          { keys: ["Layers tab"], desc: "Click any key on the on-screen layout, pick a new keycode from the picker — remaps live, no recompiling or reflashing firmware." },
+          { keys: ["Matrix Tester"], desc: "Press physical keys and watch them highlight on screen — confirms every key is wired correctly before you start remapping." },
+          { keys: ["Combos"], desc: "Press two (or more) keys at once to trigger a different action entirely — e.g. J+K together for Escape." },
+          { keys: ["Tap Dance"], desc: "One key, multiple behaviors based on tap count — single tap vs. double tap vs. hold can each do something different." },
+          { keys: ["Key Overrides"], desc: "Conditionally swap a key when a modifier is held — e.g. Shift+Backspace becomes Delete." },
+          { keys: ["Macros"], desc: "Record a sequence of keystrokes and play it back from a single key." },
+          { keys: ["QMK Settings tab"], desc: "Tune tapping term and permissive hold for home row mods right in the GUI, no config.h editing." },
+          { cmd: "Changes save instantly", desc: "Every edit in Vial writes straight to the keyboard's persistent memory — unplug and it's still there." }
         ]
       },
       {
@@ -477,17 +480,14 @@ const CHEATSHEETS = {
           { keys: ["A S D F"], desc: "Common left-hand assignment: GUI, Alt, Ctrl, Shift when held — tap for the normal letter." },
           { keys: ["J K L ;"], desc: "Mirrored on the right hand: Shift, Ctrl, Alt, GUI when held." },
           { keys: ["Tapping term"], desc: "The hold-vs-tap timing threshold (usually 150–200ms). Tune this first if letters misfire as modifiers." },
-          { keys: ["Permissive hold"], desc: "A QMK/ZMK setting that reduces accidental mod-taps by requiring another key to be pressed before a hold is treated as a modifier." }
+          { keys: ["Permissive hold"], desc: "A QMK setting that reduces accidental mod-taps by requiring another key to be pressed before a hold is treated as a modifier. Tunable in Vial's Settings tab." }
         ]
       }
     ],
     plugins: [
-      { name: "QMK Firmware", tagline: "The most widely supported open-source keyboard firmware — huge community, extensive docs, works over USB.", url: "https://qmk.fm" },
-      { name: "ZMK Firmware", tagline: "Modern firmware built for wireless (Bluetooth) split keyboards — the usual pick if your Corne is wireless.", url: "https://zmk.dev" },
-      { name: "VIA / Vial", tagline: "Point-and-click keymap editor for QMK-compatible boards — no recompiling firmware just to remap a key.", url: "https://www.caniusevia.com/" },
-      { name: "Miryoku", tagline: "A popular, minimalist layout system built around home row mods — a great reference to start from rather than designing your own from scratch.", url: "https://github.com/manna-harbour/miryoku" },
-      { name: "keymap-drawer", tagline: "Generates a clean visual diagram of your keymap straight from your QMK/ZMK config — makes memorizing your own layout much easier.", url: "https://github.com/caksoylar/keymap-drawer" },
-      { name: "r/ErgoMechKeyboards", tagline: "The main community hub for split/ergo keyboard builds, layout advice, and troubleshooting.", url: "https://www.reddit.com/r/ErgoMechKeyboards/" }
+      { name: "Vial", tagline: "Point-and-click keymap editor — remap keys, set up layers, home row mods, combos, tap-dance, and macros live over USB, no firmware recompiling. Auto-detects any board whose firmware advertises Vial support (look for a \"vial:\" USB serial number, like most pre-flashed Corne boards).", url: "https://get.vial.today/" },
+      { name: "Vial App Downloads", tagline: "Desktop app for Windows/macOS/Linux, or use vial.rocks in a WebHID-capable browser (Chrome/Edge) with no install at all.", url: "https://get.vial.today/download.html" },
+      { name: "Miryoku", tagline: "A popular, minimalist layout system built around home row mods — a great reference to start from rather than designing your own from scratch. Works fine on Vial-flashed boards too.", url: "https://github.com/manna-harbour/miryoku" }
     ]
   }
 };
