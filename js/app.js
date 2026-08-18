@@ -2,7 +2,7 @@
 // Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.6.0";
+const APP_VERSION = "2.6.1";
 
 let currentTool = "neovim";
 
@@ -101,38 +101,52 @@ function renderCorneKeyboard(layout) {
 }
 
 function renderCorneLayer(layer, layout) {
-  if (layout.isRaw) {
-    renderRawCorneGrid(layer.rows);
+  if (!layout.isRaw) {
+    // Curated layout: known 3 main rows + a separate fixed 6-key thumbs array.
+    renderCorneShapedGrid(layer.rows, layout.thumbs);
+    return;
+  }
+
+  // Uploaded .vil layer: QMK's near-universal Corne matrix is 4 rows x 12 cols
+  // (3 main rows + a thumb row padded with unused KC_NO slots on the outer columns).
+  // Detect that shape so it renders as a proper split keyboard, not a flat table.
+  if (layer.rows.length === 4 && layer.rows.every(r => r.length === 12)) {
+    const thumbs = layer.rows[3].filter(label => label !== "");
+    renderCorneShapedGrid(layer.rows.slice(0, 3), thumbs);
   } else {
-    renderCorneGrid(layer, layout.thumbs);
+    renderRawCorneGrid(layer.rows);
   }
 }
 
-// Curated layouts: known 3-row + separate thumb-row shape, so it gets the nicer indented thumb row.
-function renderCorneGrid(layer, thumbs) {
+// Renders 3 main rows (split at the midpoint column) plus a thumb row (split at the
+// midpoint of however many thumb keys there are) — used for both curated and detected-shape layouts.
+function renderCorneShapedGrid(mainRows, thumbs) {
   const grid = document.getElementById("corne-keyboard-grid");
   grid.innerHTML = "";
 
-  layer.rows.forEach(row => {
+  mainRows.forEach(row => {
     const rowEl = document.createElement("div");
     rowEl.className = "corne-row";
+    const mid = Math.floor(row.length / 2);
     row.forEach((label, colIdx) => {
       rowEl.appendChild(makeCorneKey(label));
-      if (colIdx === 5) rowEl.appendChild(makeCorneHandGap());
+      if (colIdx === mid - 1) rowEl.appendChild(makeCorneHandGap());
     });
     grid.appendChild(rowEl);
   });
 
+  if (thumbs.length === 0) return;
   const thumbRow = document.createElement("div");
   thumbRow.className = "corne-row corne-thumb-row";
+  const tmid = Math.floor(thumbs.length / 2);
   thumbs.forEach((label, idx) => {
     thumbRow.appendChild(makeCorneKey(label));
-    if (idx === 2) thumbRow.appendChild(makeCorneHandGap());
+    if (idx === tmid - 1) thumbRow.appendChild(makeCorneHandGap());
   });
   grid.appendChild(thumbRow);
 }
 
-// Uploaded layouts: unknown row/thumb shape, so render whatever the file actually contains —
+// Fallback for genuinely non-standard shapes: render whatever the file actually contains —
 // correctness over a fixed assumption. Splits each row at its midpoint if the width is even.
 function renderRawCorneGrid(rows) {
   const grid = document.getElementById("corne-keyboard-grid");

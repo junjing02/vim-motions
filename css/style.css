@@ -978,10 +978,10 @@ main.game-board {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .corne-layout-tabs {
@@ -1068,7 +1068,8 @@ main.game-board {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  padding-top: 4px;
+  margin-top: 4px;
+  padding-top: 12px;
   border-top: 1px dashed var(--border-default);
 }
 
@@ -1104,9 +1105,9 @@ main.game-board {
 .corne-keyboard-grid {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 9px;
   width: max-content;
-  padding: 4px 2px;
+  padding: 6px 2px;
 }
 
 .corne-row {
@@ -1151,16 +1152,20 @@ main.game-board {
 }
 
 .corne-keyboard-note {
+  margin-top: 2px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-default);
   font-size: 11px;
   color: var(--text-muted);
   font-style: italic;
+  line-height: 1.5;
 }
 
 /* Shortcut Categories & Cards */
 .shortcut-category {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   scroll-margin-top: 10px;
 }
 
@@ -1187,10 +1192,10 @@ main.game-board {
 
 .shortcut-card {
   background-color: var(--bg-secondary);
-  padding: 10px 12px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   transition: var(--transition-fast);
 }
 
@@ -1205,7 +1210,7 @@ main.game-board {
 .shortcut-keys {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 5px;
   align-items: center;
 }
 
@@ -1260,10 +1265,10 @@ main.game-board {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius);
-  padding: 15px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
   text-decoration: none;
   color: inherit;
   transition: var(--transition-fast);

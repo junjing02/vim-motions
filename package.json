@@ -1,6 +1,6 @@
 {
   "name": "terminal-ide-cheatsheet",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "A searchable, mobile-friendly cheatsheet for Neovim, tmux, lazygit, and the Corne 42 split keyboard, with curated resources and a Vim motions practice drill.",
   "main": "server.js",
   "scripts": {
