@@ -1,7 +1,7 @@
 {
   "name": "terminal-ide-cheatsheet",
-  "version": "2.6.2",
-  "description": "A searchable, mobile-friendly cheatsheet for Neovim, tmux, lazygit, and the Corne 42 split keyboard, with curated resources and a Vim motions practice drill.",
+  "version": "2.7.0",
+  "description": "The go-to reference for a terminal dev workflow: Neovim, tmux, lazygit, Claude Code, and the Corne 42 split keyboard, plus a Workflow tab showing how they fit together and a Vim motions practice drill.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -12,13 +12,15 @@
     "neovim",
     "tmux",
     "lazygit",
+    "claude-code",
     "cheatsheet",
     "terminal",
     "shortcuts",
     "corne",
     "split-keyboard",
     "qmk",
-    "zmk"
+    "zmk",
+    "workflow"
   ],
   "author": "Antigravity",
   "license": "MIT"

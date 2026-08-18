@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- SEO Meta Tags -->
-  <title>Terminal IDE Cheatsheet: Neovim, tmux, lazygit &amp; Corne 42</title>
-  <meta name="description" content="A fast, searchable cheatsheet for Neovim, tmux, and lazygit shortcuts plus curated plugin picks, a Corne 42 split-keyboard layout guide, and a Vim motions practice drill.">
-  <meta name="keywords" content="neovim, tmux, lazygit, cheatsheet, shortcuts, vim motions, terminal ide, plugins, corne, split keyboard, qmk, zmk">
+  <title>Terminal IDE Cheatsheet: Neovim, tmux, lazygit, Claude Code &amp; Corne 42</title>
+  <meta name="description" content="The go-to reference for a terminal-based dev workflow: Neovim, tmux, lazygit, and Claude Code shortcuts, a Corne 42 split-keyboard layout guide, and a Workflow tab showing how they all fit together.">
+  <meta name="keywords" content="neovim, tmux, lazygit, claude code, cheatsheet, shortcuts, vim motions, terminal ide, plugins, corne, split keyboard, qmk, zmk, workflow">
 
   <!-- ?v= query strings below are cache-busting: bump them alongside APP_VERSION in js/app.js
        so a normal refresh (not just a hard refresh) picks up new JS/CSS. -->
-  <link rel="stylesheet" href="css/style.css?v=2.6.2">
+  <link rel="stylesheet" href="css/style.css?v=2.7.0">
 </head>
 <body>
 
@@ -23,10 +23,12 @@
 
     <div class="header-mode header-mode-cheatsheet" id="header-cheatsheet-controls">
       <nav class="tool-tabs" id="tool-tabs" aria-label="Tool selector">
-        <button class="tool-tab active" data-tool="neovim">Neovim</button>
+        <button class="tool-tab active" data-tool="workflow">Workflow</button>
+        <button class="tool-tab" data-tool="neovim">Neovim</button>
         <button class="tool-tab" data-tool="tmux">tmux</button>
         <button class="tool-tab" data-tool="lazygit">lazygit</button>
         <button class="tool-tab" data-tool="corne">Corne 42</button>
+        <button class="tool-tab" data-tool="claudecode">Claude Code</button>
       </nav>
       <input type="search" id="search-input" class="search-bar" placeholder="Search shortcuts &amp; plugins...">
     </div>
@@ -86,6 +88,11 @@
         </section>
 
         <div id="shortcut-sections">
+          <!-- Populated dynamically by app.js -->
+        </div>
+
+        <!-- Workflow tab only: the connective step-by-step guide across all 5 tools -->
+        <div id="workflow-steps" style="display: none;">
           <!-- Populated dynamically by app.js -->
         </div>
 
@@ -201,9 +208,9 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/cheatsheet.js?v=2.6.2"></script>
-  <script src="js/levels.js?v=2.6.2"></script>
-  <script src="js/practice.js?v=2.6.2"></script>
-  <script src="js/app.js?v=2.6.2"></script>
+  <script src="js/cheatsheet.js?v=2.7.0"></script>
+  <script src="js/levels.js?v=2.7.0"></script>
+  <script src="js/practice.js?v=2.7.0"></script>
+  <script src="js/app.js?v=2.7.0"></script>
 </body>
 </html>

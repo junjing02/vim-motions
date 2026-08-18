@@ -489,5 +489,147 @@ const CHEATSHEETS = {
       { name: "Vial App Downloads", tagline: "Desktop app for Windows/macOS/Linux, or use vial.rocks in a WebHID-capable browser (Chrome/Edge) with no install at all.", url: "https://get.vial.today/download.html" },
       { name: "Miryoku", tagline: "A popular, minimalist layout system built around home row mods — a great reference to start from rather than designing your own from scratch. Works fine on Vial-flashed boards too.", url: "https://github.com/manna-harbour/miryoku" }
     ]
+  },
+
+  claudecode: {
+    id: "claudecode",
+    name: "Claude Code",
+    tagline: "An agentic coding assistant that lives in your terminal — reads, edits, and runs code directly in your project instead of a chat window you copy-paste from.",
+    prefixKey: null,
+    pluginsLabel: "Resources",
+    categories: [
+      {
+        id: "essentials",
+        title: "Essentials",
+        shortcuts: [
+          { keys: ["/help"], desc: "Show help and available commands" },
+          { keys: ["/clear"], desc: "Start a new conversation with empty context" },
+          { keys: ["/compact"], desc: "Summarize the conversation so far to free up context" },
+          { keys: ["/init"], desc: "Generate a CLAUDE.md project guide from the current codebase" },
+          { keys: ["/resume"], desc: "Return to an earlier conversation" },
+          { keys: ["/cost"], desc: "Show token usage and cost for the session (alias: /usage)" },
+          { keys: ["/exit"], desc: "Exit the CLI" }
+        ]
+      },
+      {
+        id: "keyboard-shortcuts",
+        title: "Keyboard Shortcuts",
+        shortcuts: [
+          { keys: ["Ctrl+C"], desc: "Interrupt, or clear input — press twice with nothing running to exit" },
+          { keys: ["Ctrl+D"], desc: "Exit the Claude Code session" },
+          { keys: ["Esc"], desc: "Interrupt Claude mid-turn, or close an open dialog" },
+          { keys: ["Esc", "Esc"], desc: "Clear the input draft, or (on empty input) open the rewind menu" },
+          { keys: ["Shift+Tab"], desc: "Cycle permission modes: default → acceptEdits → plan → bypassPermissions" },
+          { keys: ["Ctrl+R"], desc: "Reverse search your prompt history" },
+          { keys: ["Ctrl+O"], desc: "Toggle the transcript viewer (detailed tool usage)" },
+          { keys: ["Ctrl+L"], desc: "Redraw the screen — press twice quickly to run /clear" },
+          { keys: ["\\", "Enter"], desc: "Insert a newline for multiline input (also Shift+Enter in most terminals)" },
+          { keys: ["Ctrl+B"], desc: "Move a running Bash command to the background" }
+        ]
+      },
+      {
+        id: "modes-input",
+        title: "Modes & Input",
+        shortcuts: [
+          { keys: ["/", "{command}"], desc: "Start a built-in command or skill" },
+          { keys: ["!", "{command}"], desc: "Shell mode — run a command directly and add its output to context" },
+          { keys: ["@", "{path}"], desc: "File path mention with autocomplete" },
+          { cmd: "/plan {description}", desc: "Enter plan mode — Claude researches and proposes an approach before editing anything" },
+          { cmd: "/config editorMode vim", desc: "Enable vim-style editing of your own prompt input" }
+        ]
+      },
+      {
+        id: "review-quality",
+        title: "Review & Quality",
+        shortcuts: [
+          { keys: ["/code-review"], desc: "Review the current diff or a PR for correctness bugs and cleanup" },
+          { keys: ["/review"], desc: "Alias for /code-review" },
+          { keys: ["/security-review"], desc: "Check the current diff for security vulnerabilities" },
+          { keys: ["/simplify"], desc: "Simplify code in a diff or file" },
+          { keys: ["/rewind"], desc: "Roll code and conversation back to an earlier checkpoint" }
+        ]
+      },
+      {
+        id: "session-config",
+        title: "Session & Config",
+        shortcuts: [
+          { keys: ["/agents"], desc: "Manage subagent configurations" },
+          { keys: ["/memory"], desc: "Edit CLAUDE.md files and manage auto memory" },
+          { keys: ["/permissions"], desc: "Manage allow / ask / deny rules for tool use" },
+          { keys: ["/mcp"], desc: "Manage MCP server connections and OAuth authentication" },
+          { keys: ["/model"], desc: "Switch the active model" },
+          { keys: ["/context"], desc: "Visualize current context usage as a colored grid" },
+          { keys: ["/doctor"], desc: "Run a setup checkup to diagnose and fix issues" }
+        ]
+      }
+    ],
+    plugins: [
+      { name: "Official Docs", tagline: "The complete reference — every command, setting, and feature, kept current.", url: "https://code.claude.com/docs" },
+      { name: "Slash Commands Reference", tagline: "The full built-in commands list — this page curates the essentials, the docs have all of them.", url: "https://code.claude.com/docs/en/commands" },
+      { name: "MCP Servers", tagline: "Connect Claude Code to external tools and data sources via the Model Context Protocol.", url: "https://code.claude.com/docs/en/mcp" },
+      { name: "Skills & Custom Commands", tagline: "Package repeatable instructions into your own /commands instead of re-explaining them every session.", url: "https://code.claude.com/docs/en/skills" }
+    ]
+  },
+
+  workflow: {
+    id: "workflow",
+    name: "Workflow",
+    tagline: "How Neovim, tmux, lazygit, Claude Code, and your Corne keyboard actually fit together in one real coding session.",
+    prefixKey: null,
+    isWorkflow: true,
+    pluginsLabel: "Go Deeper on Each Tool",
+    steps: [
+      {
+        tool: "corne",
+        title: "Hands stay on home row",
+        desc: "Your Corne's layers put numbers, symbols, arrows, and function keys under thumb-held layers instead of a separate row you have to reach for. Every tool below is faster because your fingers barely move."
+      },
+      {
+        tool: "tmux",
+        title: "Start a persistent session",
+        desc: "tmux new -s project opens a session that survives closing your terminal. Split it into panes — one for your editor, one for git, one free for commands — with Prefix % and Prefix \".",
+        keys: ["Prefix", "%"]
+      },
+      {
+        tool: "neovim",
+        title: "Edit with motions, not a mouse",
+        desc: "Open your project with nvim . and navigate/edit with motions and operators — w/b to jump words, ciw to change a word, da{ to delete a whole block — instead of clicking and dragging."
+      },
+      {
+        tool: "claudecode",
+        title: "Ask Claude Code to make the change",
+        desc: "Run claude in a spare tmux pane. Describe what you want in plain English — it reads your actual files, writes the edit, and can run your tests, right in the same project. Shift+Tab cycles between asking before every edit and auto-accepting them.",
+        keys: ["Shift+Tab"]
+      },
+      {
+        tool: "neovim",
+        title: "Review what changed, right where you were",
+        desc: "Jump back to your Neovim pane (no window switching to a browser or separate app) to read through and tweak whatever Claude Code just wrote."
+      },
+      {
+        tool: "lazygit",
+        title: "Stage, commit, and push",
+        desc: "Run lazygit in another pane — Space to stage a file, c to commit, P to push — all without memorizing git flags or leaving the terminal."
+      },
+      {
+        tool: "claudecode",
+        title: "Let it review the diff before you commit",
+        desc: "/code-review checks the pending changes for correctness bugs and cleanup opportunities before you write the commit message — a second pair of eyes that never gets tired.",
+        keys: ["/code-review"]
+      },
+      {
+        tool: "tmux",
+        title: "Detach, walk away, come back",
+        desc: "Prefix d detaches the whole session — panes, running processes, everything — without closing anything. tmux attach later puts you back exactly where you left off.",
+        keys: ["Prefix", "d"]
+      }
+    ],
+    plugins: [
+      { name: "Neovim shortcuts", tagline: "Jump to the full motions, operators, and text-objects reference.", url: "#neovim" },
+      { name: "tmux shortcuts", tagline: "Jump to sessions, windows, and panes.", url: "#tmux" },
+      { name: "lazygit shortcuts", tagline: "Jump to the files, branches, and commits panels.", url: "#lazygit" },
+      { name: "Claude Code shortcuts", tagline: "Jump to essential commands and keyboard shortcuts.", url: "#claudecode" },
+      { name: "Corne 42 layouts", tagline: "Jump to layers, keycodes, and your own uploaded keymap.", url: "#corne" }
+    ]
   }
 };

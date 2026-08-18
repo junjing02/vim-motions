@@ -1166,6 +1166,84 @@ main.game-board {
   line-height: 1.5;
 }
 
+/* Workflow Tab: a connective timeline across all 5 tools */
+#workflow-steps {
+  flex-direction: column;
+}
+
+.workflow-step {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 26px;
+  position: relative;
+}
+
+.workflow-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--border-default);
+}
+
+.workflow-step-number {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-secondary);
+  position: relative;
+  z-index: 1;
+}
+
+.workflow-step-body {
+  flex: 1;
+  padding-top: 3px;
+}
+
+.workflow-tool-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 7px;
+}
+
+.workflow-tool-neovim { background-color: #e6f7ea; color: var(--accent-green); }
+.workflow-tool-tmux { background-color: #f0e9f7; color: var(--accent-purple); }
+.workflow-tool-lazygit { background-color: #fbe8ef; color: var(--accent-pink); }
+.workflow-tool-claudecode { background-color: #eaf3fa; color: var(--accent-cyan); }
+.workflow-tool-corne { background-color: #fbeaea; color: var(--accent-red); }
+
+.workflow-step-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.workflow-step-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.workflow-step-keys {
+  margin-top: 9px;
+}
+
 /* Shortcut Categories & Cards */
 .shortcut-category {
   display: flex;

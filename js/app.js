@@ -2,9 +2,9 @@
 // Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.6.2";
+const APP_VERSION = "2.7.0";
 
-let currentTool = "neovim";
+let currentTool = "workflow";
 
 // --- Cheatsheet rendering ---
 
@@ -36,8 +36,19 @@ function renderTool(toolId) {
     keyboardSection.style.display = "none";
   }
 
-  renderCategoryNav(tool);
-  renderShortcutSections(tool);
+  const shortcutSectionsEl = document.getElementById("shortcut-sections");
+  const workflowStepsEl = document.getElementById("workflow-steps");
+  if (tool.isWorkflow) {
+    shortcutSectionsEl.style.display = "none";
+    workflowStepsEl.style.display = "flex";
+    document.getElementById("category-nav").innerHTML = "";
+    renderWorkflowSteps(tool);
+  } else {
+    shortcutSectionsEl.style.display = "flex";
+    workflowStepsEl.style.display = "none";
+    renderCategoryNav(tool);
+    renderShortcutSections(tool);
+  }
   renderPluginsGrid(tool);
 
   document.getElementById("search-input").value = "";
@@ -313,6 +324,54 @@ function renderCategoryNav(tool) {
   nav.appendChild(pluginsNavItem);
 }
 
+function renderWorkflowSteps(tool) {
+  const container = document.getElementById("workflow-steps");
+  container.innerHTML = "";
+
+  tool.steps.forEach((step, idx) => {
+    const stepEl = document.createElement("div");
+    stepEl.className = "workflow-step";
+
+    const numberEl = document.createElement("div");
+    numberEl.className = "workflow-step-number";
+    numberEl.textContent = idx + 1;
+    stepEl.appendChild(numberEl);
+
+    const bodyEl = document.createElement("div");
+    bodyEl.className = "workflow-step-body";
+
+    const badgeEl = document.createElement("span");
+    badgeEl.className = `workflow-tool-badge workflow-tool-${step.tool}`;
+    badgeEl.textContent = CHEATSHEETS[step.tool].name;
+    bodyEl.appendChild(badgeEl);
+
+    const titleEl = document.createElement("h3");
+    titleEl.className = "workflow-step-title";
+    titleEl.textContent = step.title;
+    bodyEl.appendChild(titleEl);
+
+    const descEl = document.createElement("p");
+    descEl.className = "workflow-step-desc";
+    descEl.textContent = step.desc;
+    bodyEl.appendChild(descEl);
+
+    if (step.keys) {
+      const keysEl = document.createElement("div");
+      keysEl.className = "shortcut-keys workflow-step-keys";
+      step.keys.forEach(k => {
+        const cap = document.createElement("span");
+        cap.className = "key-cap";
+        cap.textContent = k;
+        keysEl.appendChild(cap);
+      });
+      bodyEl.appendChild(keysEl);
+    }
+
+    stepEl.appendChild(bodyEl);
+    container.appendChild(stepEl);
+  });
+}
+
 function renderShortcutSections(tool) {
   const container = document.getElementById("shortcut-sections");
   container.innerHTML = "";
@@ -370,17 +429,25 @@ function renderPluginsGrid(tool) {
   grid.innerHTML = "";
 
   tool.plugins.forEach(p => {
+    const isInternal = p.url.startsWith("#");
     const card = document.createElement("a");
     card.className = "plugin-card";
     card.href = p.url;
-    card.target = "_blank";
-    card.rel = "noopener noreferrer";
     card.dataset.search = (p.name + " " + p.tagline).toLowerCase();
     card.innerHTML = `
       <h3>${p.name}</h3>
       <p>${p.tagline}</p>
-      <span class="plugin-link">View &rarr;</span>
+      <span class="plugin-link">${isInternal ? "Jump to tab" : "View"} &rarr;</span>
     `;
+    if (isInternal) {
+      card.addEventListener("click", (e) => {
+        e.preventDefault();
+        renderTool(p.url.slice(1));
+      });
+    } else {
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+    }
     grid.appendChild(card);
   });
 }
@@ -459,7 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("corne-vil-upload").addEventListener("change", handleVilUpload);
   document.getElementById("corne-upload-clear").addEventListener("click", clearVilUpload);
 
-  renderTool("neovim");
+  renderTool("workflow");
 });
 
 function handleVilUpload(e) {
