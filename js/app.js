@@ -2,7 +2,7 @@
 // Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.5.1";
+const APP_VERSION = "2.6.0";
 
 let currentTool = "neovim";
 
@@ -31,7 +31,7 @@ function renderTool(toolId) {
   const keyboardSection = document.getElementById("corne-keyboard-section");
   if (tool.keyboardLayouts) {
     keyboardSection.style.display = "block";
-    renderCorneLayoutTabs(tool.keyboardLayouts);
+    renderCorneLayoutTabs(getCorneLayouts());
   } else {
     keyboardSection.style.display = "none";
   }
@@ -50,13 +50,23 @@ function renderTool(toolId) {
 
 // --- Corne 42 keyboard layer viewer ---
 
-function renderCorneLayoutTabs(layouts) {
+let customCorneLayout = null; // populated from an uploaded .vil file; persists across tab switches
+
+function getCorneLayouts() {
+  const base = CHEATSHEETS.corne.keyboardLayouts;
+  return customCorneLayout ? [...base, customCorneLayout] : base;
+}
+
+function renderCorneLayoutTabs(layouts, selectId) {
   const layoutTabsEl = document.getElementById("corne-layout-tabs");
   layoutTabsEl.innerHTML = "";
 
+  let selectedIdx = selectId ? layouts.findIndex(l => l.id === selectId) : 0;
+  if (selectedIdx < 0) selectedIdx = 0;
+
   layouts.forEach((layout, idx) => {
     const btn = document.createElement("button");
-    btn.className = "corne-layout-tab" + (idx === 0 ? " active" : "");
+    btn.className = "corne-layout-tab" + (idx === selectedIdx ? " active" : "");
     btn.textContent = layout.name;
     btn.addEventListener("click", () => {
       document.querySelectorAll(".corne-layout-tab").forEach(el => el.classList.remove("active"));
@@ -66,7 +76,7 @@ function renderCorneLayoutTabs(layouts) {
     layoutTabsEl.appendChild(btn);
   });
 
-  renderCorneKeyboard(layouts[0]);
+  renderCorneKeyboard(layouts[selectedIdx]);
 }
 
 function renderCorneKeyboard(layout) {
@@ -82,14 +92,23 @@ function renderCorneKeyboard(layout) {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".corne-layer-tab").forEach(el => el.classList.remove("active"));
       btn.classList.add("active");
-      renderCorneGrid(layer, layout.thumbs);
+      renderCorneLayer(layer, layout);
     });
     tabsEl.appendChild(btn);
   });
 
-  renderCorneGrid(layout.layers[0], layout.thumbs);
+  renderCorneLayer(layout.layers[0], layout);
 }
 
+function renderCorneLayer(layer, layout) {
+  if (layout.isRaw) {
+    renderRawCorneGrid(layer.rows);
+  } else {
+    renderCorneGrid(layer, layout.thumbs);
+  }
+}
+
+// Curated layouts: known 3-row + separate thumb-row shape, so it gets the nicer indented thumb row.
 function renderCorneGrid(layer, thumbs) {
   const grid = document.getElementById("corne-keyboard-grid");
   grid.innerHTML = "";
@@ -113,9 +132,27 @@ function renderCorneGrid(layer, thumbs) {
   grid.appendChild(thumbRow);
 }
 
+// Uploaded layouts: unknown row/thumb shape, so render whatever the file actually contains —
+// correctness over a fixed assumption. Splits each row at its midpoint if the width is even.
+function renderRawCorneGrid(rows) {
+  const grid = document.getElementById("corne-keyboard-grid");
+  grid.innerHTML = "";
+
+  rows.forEach(row => {
+    const rowEl = document.createElement("div");
+    rowEl.className = "corne-row";
+    const mid = Math.floor(row.length / 2);
+    row.forEach((label, colIdx) => {
+      rowEl.appendChild(makeCorneKey(label));
+      if (row.length % 2 === 0 && colIdx === mid - 1) rowEl.appendChild(makeCorneHandGap());
+    });
+    grid.appendChild(rowEl);
+  });
+}
+
 function makeCorneKey(label) {
   const el = document.createElement("div");
-  el.className = "corne-key" + (label === "·" ? " corne-key-trans" : "");
+  el.className = "corne-key" + (label === "·" || label === "" ? " corne-key-trans" : "");
   el.textContent = label;
   return el;
 }
@@ -124,6 +161,60 @@ function makeCorneHandGap() {
   const gap = document.createElement("div");
   gap.className = "corne-hand-gap";
   return gap;
+}
+
+// --- .vil upload: parse a Vial keymap export into the same layout/layer shape used above ---
+
+const QMK_KEYCODE_LABELS = {
+  TRNS: "·", NO: "",
+  ESC: "Esc", SPC: "Space", ENT: "Enter", BSPC: "Bspc", TAB: "Tab", DEL: "Del",
+  LSFT: "Shift", RSFT: "Shift", LCTL: "Ctrl", RCTL: "Ctrl", LALT: "Alt", RALT: "Alt",
+  LGUI: "GUI", RGUI: "GUI", CAPS: "Caps",
+  LEFT: "Left", RGHT: "Right", RIGHT: "Right", UP: "Up", DOWN: "Down",
+  HOME: "Home", END: "End", PGUP: "PgUp", PGDN: "PgDn", INS: "Ins", PSCR: "PScr",
+  MINS: "-", EQL: "=", LBRC: "[", RBRC: "]", BSLS: "\\", SCLN: ";", QUOT: "'",
+  GRV: "`", COMM: ",", DOT: ".", SLSH: "/",
+  BOOT: "BOOT", QK_BOOT: "BOOT", RESET: "BOOT"
+};
+
+function translateKeycode(raw) {
+  if (raw === undefined || raw === null) return "";
+  const kc = String(raw).trim();
+  if (!kc) return "";
+
+  const layerFn = kc.match(/^(MO|TG|TO|TT|OSL|DF)\((\d+)\)$/);
+  if (layerFn) return `${layerFn[1]}(${layerFn[2]})`;
+
+  const ltFn = kc.match(/^LT(\d+)\((KC_\w+)\)$/) || kc.match(/^LT\((\d+),\s*(KC_\w+)\)$/);
+  if (ltFn) return `LT(${ltFn[1]},${translateKeycode(ltFn[2])})`;
+
+  const core = kc.startsWith("KC_") ? kc.slice(3) : kc;
+  if (core in QMK_KEYCODE_LABELS) return QMK_KEYCODE_LABELS[core];
+  if (/^[A-Z0-9]$/.test(core)) return core;
+  if (/^F(2[0-4]|1[0-9]|[1-9])$/.test(core)) return core;
+
+  return core || kc;
+}
+
+function parseVilFile(data) {
+  if (!data || !Array.isArray(data.layout) || data.layout.length === 0) {
+    throw new Error('No "layout" array found — this doesn\'t look like a Vial keymap export.');
+  }
+
+  const layers = data.layout.map((layerRows, idx) => {
+    if (!Array.isArray(layerRows) || !Array.isArray(layerRows[0])) {
+      throw new Error(`Layer ${idx} isn't in the expected row/column shape.`);
+    }
+    return { id: `layer${idx}`, label: `Layer ${idx}`, rows: layerRows.map(row => row.map(translateKeycode)) };
+  });
+
+  return {
+    id: "uploaded",
+    name: "Your Layout",
+    isRaw: true,
+    note: "Parsed directly from your uploaded .vil file — keycodes are exact. Grid position mirrors your file's raw row/column order, which may not perfectly match physical key placement if your board's wiring differs from the standard Corne matrix.",
+    layers
+  };
 }
 
 function renderCategoryNav(tool) {
@@ -297,5 +388,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("practice-toggle-btn").addEventListener("click", togglePracticeMode);
 
+  document.getElementById("corne-vil-upload").addEventListener("change", handleVilUpload);
+  document.getElementById("corne-upload-clear").addEventListener("click", clearVilUpload);
+
   renderTool("neovim");
 });
+
+function handleVilUpload(e) {
+  const file = e.target.files[0];
+  const statusEl = document.getElementById("corne-upload-status");
+  const clearBtn = document.getElementById("corne-upload-clear");
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      customCorneLayout = parseVilFile(data);
+      statusEl.textContent = `Loaded "${file.name}"`;
+      statusEl.classList.remove("corne-upload-error");
+      clearBtn.style.display = "";
+      renderCorneLayoutTabs(getCorneLayouts(), customCorneLayout.id);
+    } catch (err) {
+      customCorneLayout = null;
+      statusEl.textContent = `Couldn't read that file: ${err.message}`;
+      statusEl.classList.add("corne-upload-error");
+      clearBtn.style.display = "none";
+    }
+  };
+  reader.onerror = () => {
+    statusEl.textContent = "Couldn't read that file.";
+    statusEl.classList.add("corne-upload-error");
+  };
+  reader.readAsText(file);
+  e.target.value = ""; // allow re-uploading the same filename later
+}
+
+function clearVilUpload() {
+  customCorneLayout = null;
+  document.getElementById("corne-upload-status").textContent = "Stays in your browser — never uploaded anywhere.";
+  document.getElementById("corne-upload-status").classList.remove("corne-upload-error");
+  document.getElementById("corne-upload-clear").style.display = "none";
+  renderCorneLayoutTabs(getCorneLayouts());
+}
