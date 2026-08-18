@@ -1126,8 +1126,11 @@ main.game-board {
 }
 
 /* Wide enough for the longest label used ("T/Shift", "RGB Mode") without breaking column alignment */
+/* Uploaded keymaps can carry long combo labels (e.g. "Ctrl+GUI+Q") that don't fit the
+   fixed width — truncate with an ellipsis rather than break grid alignment; full text
+   is still available via the title tooltip set in makeCorneKey(). */
 .corne-key {
-  width: 54px;
+  width: 56px;
   height: 34px;
   flex-shrink: 0;
   background-color: var(--bg-tertiary);
@@ -1141,7 +1144,9 @@ main.game-board {
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
-  padding: 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 3px;
 }
 
 .corne-key-trans {

@@ -2,7 +2,7 @@
 // Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.6.1";
+const APP_VERSION = "2.6.2";
 
 let currentTool = "neovim";
 
@@ -107,15 +107,30 @@ function renderCorneLayer(layer, layout) {
     return;
   }
 
-  // Uploaded .vil layer: QMK's near-universal Corne matrix is 4 rows x 12 cols
-  // (3 main rows + a thumb row padded with unused KC_NO slots on the outer columns).
-  // Detect that shape so it renders as a proper split keyboard, not a flat table.
-  if (layer.rows.length === 4 && layer.rows.every(r => r.length === 12)) {
-    const thumbs = layer.rows[3].filter(label => label !== "");
-    renderCorneShapedGrid(layer.rows.slice(0, 3), thumbs);
-  } else {
-    renderRawCorneGrid(layer.rows);
+  const rows = layer.rows;
+
+  // Shape A: one 4-row x 12-col matrix — 3 main rows + a thumb row padded with
+  // unused slots on the outer columns (both hands interleaved column-wise).
+  if (rows.length === 4 && rows.every(r => r.length === 12)) {
+    const thumbs = rows[3].filter(label => label !== "");
+    renderCorneShapedGrid(rows.slice(0, 3), thumbs);
+    return;
   }
+
+  // Shape B: two 4-row x 6-col halves stacked vertically — rows 0-3 are the left
+  // hand, rows 4-7 are the right hand, each 3 main rows + 1 padded thumb row.
+  // This is what Vial actually exports for split boards (confirmed against a
+  // real Corne .vil export), rather than one interleaved 4x12 matrix.
+  if (rows.length === 8 && rows.every(r => r.length === 6)) {
+    const left = rows.slice(0, 4);
+    const right = rows.slice(4, 8);
+    const mainRows = [0, 1, 2].map(i => [...left[i], ...right[i]]);
+    const thumbs = [...left[3], ...right[3]].filter(label => label !== "");
+    renderCorneShapedGrid(mainRows, thumbs);
+    return;
+  }
+
+  renderRawCorneGrid(rows);
 }
 
 // Renders 3 main rows (split at the midpoint column) plus a thumb row (split at the
@@ -168,6 +183,7 @@ function makeCorneKey(label) {
   const el = document.createElement("div");
   el.className = "corne-key" + (label === "·" || label === "" ? " corne-key-trans" : "");
   el.textContent = label;
+  if (label.length > 6) el.title = label; // long labels get ellipsis-truncated; hover shows the rest
   return el;
 }
 
@@ -179,28 +195,66 @@ function makeCorneHandGap() {
 
 // --- .vil upload: parse a Vial keymap export into the same layout/layer shape used above ---
 
+// Both short (KC_ESC) and long (KC_ESCAPE) QMK aliases appear in the wild — Vial's own
+// export favors the long forms, confirmed against a real Corne .vil file.
 const QMK_KEYCODE_LABELS = {
   TRNS: "·", NO: "",
-  ESC: "Esc", SPC: "Space", ENT: "Enter", BSPC: "Bspc", TAB: "Tab", DEL: "Del",
+  ESC: "Esc", ESCAPE: "Esc",
+  SPC: "Space", SPACE: "Space",
+  ENT: "Enter", ENTER: "Enter",
+  BSPC: "Bspc", BSPACE: "Bspc",
+  DEL: "Del", DELETE: "Del",
+  TAB: "Tab", CAPS: "Caps",
   LSFT: "Shift", RSFT: "Shift", LCTL: "Ctrl", RCTL: "Ctrl", LALT: "Alt", RALT: "Alt",
-  LGUI: "GUI", RGUI: "GUI", CAPS: "Caps",
+  LGUI: "GUI", RGUI: "GUI",
   LEFT: "Left", RGHT: "Right", RIGHT: "Right", UP: "Up", DOWN: "Down",
-  HOME: "Home", END: "End", PGUP: "PgUp", PGDN: "PgDn", INS: "Ins", PSCR: "PScr",
-  MINS: "-", EQL: "=", LBRC: "[", RBRC: "]", BSLS: "\\", SCLN: ";", QUOT: "'",
-  GRV: "`", COMM: ",", DOT: ".", SLSH: "/",
-  BOOT: "BOOT", QK_BOOT: "BOOT", RESET: "BOOT"
+  HOME: "Home", END: "End",
+  PGUP: "PgUp", PGDN: "PgDn", PGDOWN: "PgDn",
+  INS: "Ins", PSCR: "PScr",
+  MINS: "-", MINUS: "-",
+  EQL: "=", EQUAL: "=",
+  LBRC: "[", LBRACKET: "[",
+  RBRC: "]", RBRACKET: "]",
+  BSLS: "\\", BSLASH: "\\",
+  SCLN: ";", SCOLON: ";",
+  QUOT: "'", QUOTE: "'",
+  GRV: "`", GRAVE: "`",
+  COMM: ",", COMMA: ",",
+  DOT: ".", SLSH: "/", SLASH: "/",
+  BOOT: "BOOT", QK_BOOT: "BOOT", RESET: "BOOT",
+  BTN1: "Btn1", BTN2: "Btn2", BTN3: "Btn3",
+  MS_U: "M-Up", MS_D: "M-Down", MS_L: "M-Left", MS_R: "M-Right",
+  MNXT: "Next", MPRV: "Prev", MPLY: "Play/Pause", MUTE: "Mute",
+  VOLU: "Vol+", VOLD: "Vol−",
+  RGB_TOG: "RGB Tog", RGB_MOD: "RGB Mode", RGB_VAI: "Bright+", RGB_VAD: "Bright−",
+  RGB_SPI: "Speed+", RGB_SPD: "Speed−"
 };
 
+const MOD_WRAP_LABELS = { CTL: "Ctrl", SFT: "Shift", ALT: "Alt", GUI: "GUI" };
+const MOD_LETTER_LABELS = { C: "Ctrl", S: "Shift", A: "Alt", G: "GUI" };
+
 function translateKeycode(raw) {
-  if (raw === undefined || raw === null) return "";
+  // Vial exports empty matrix positions as the integer -1, not a string
+  if (raw === undefined || raw === null || raw === -1 || raw === "-1") return "";
   const kc = String(raw).trim();
   if (!kc) return "";
 
-  const layerFn = kc.match(/^(MO|TG|TO|TT|OSL|DF)\((\d+)\)$/);
+  const layerFn = kc.match(/^(MO|TG|TO|TT|OSL|DF|TD)\((\d+)\)$/);
   if (layerFn) return `${layerFn[1]}(${layerFn[2]})`;
 
   const ltFn = kc.match(/^LT(\d+)\((KC_\w+)\)$/) || kc.match(/^LT\((\d+),\s*(KC_\w+)\)$/);
   if (ltFn) return `LT(${ltFn[1]},${translateKeycode(ltFn[2])})`;
+
+  // Single-modifier wrapper, e.g. LCTL(KC_SPACE) -> "Ctrl+Space"
+  const modWrap = kc.match(/^[LR](CTL|SFT|ALT|GUI)\((.+)\)$/);
+  if (modWrap) return `${MOD_WRAP_LABELS[modWrap[1]]}+${translateKeycode(modWrap[2])}`;
+
+  // Combined-modifier shorthand, e.g. LCG(KC_Q) -> "Ctrl+GUI+Q" (C/S/A/G = Ctrl/Shift/Alt/GUI)
+  const comboWrap = kc.match(/^[LR]([CSAG]{2,4})\((.+)\)$/);
+  if (comboWrap) {
+    const mods = comboWrap[1].split("").map(l => MOD_LETTER_LABELS[l]).join("+");
+    return `${mods}+${translateKeycode(comboWrap[2])}`;
+  }
 
   const core = kc.startsWith("KC_") ? kc.slice(3) : kc;
   if (core in QMK_KEYCODE_LABELS) return QMK_KEYCODE_LABELS[core];
