@@ -2,7 +2,7 @@
 // Practice Mode toggle for the Neovim motions drill.
 
 // Keep in sync with the "version" field in package.json — shown in the page footer.
-const APP_VERSION = "2.7.2";
+const APP_VERSION = "2.8.0";
 
 let currentTool = "workflow";
 

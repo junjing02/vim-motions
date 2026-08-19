@@ -274,6 +274,11 @@ aside.campaign-sidebar {
   font-weight: 700;
 }
 
+.solved-subtopic {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+
 .cell-status {
   font-weight: 700;
   color: var(--text-muted);
@@ -555,6 +560,30 @@ main.game-board {
   flex: 1;
   display: flex;
   align-items: center;
+}
+
+.challenge-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-default);
+}
+
+.challenge-solved-badge {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+.challenge-nav .glow-btn:disabled,
+.challenge-nav .btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: var(--bg-secondary);
+  border-color: var(--border-default);
 }
 
 #hint-text {

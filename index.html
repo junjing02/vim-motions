@@ -11,7 +11,7 @@
 
   <!-- ?v= query strings below are cache-busting: bump them alongside APP_VERSION in js/app.js
        so a normal refresh (not just a hard refresh) picks up new JS/CSS. -->
-  <link rel="stylesheet" href="css/style.css?v=2.7.2">
+  <link rel="stylesheet" href="css/style.css?v=2.8.0">
 </head>
 <body>
 
@@ -178,6 +178,12 @@
                   <span id="hint-text">Hint: <span class="key-sequence">l</span></span>
                 </div>
               </div>
+
+              <div class="challenge-nav" id="challenge-nav">
+                <button id="prev-challenge-btn" class="btn-secondary" title="Go back and retry an earlier challenge">&larr; Previous</button>
+                <span class="challenge-solved-badge" id="challenge-solved-badge" style="display: none;">&check; Solved &mdash; keep practicing or move on</span>
+                <button id="next-challenge-btn" class="glow-btn" disabled title="Solve this challenge to unlock">Next &rarr;</button>
+              </div>
             </div>
 
             <div class="split-tip-card" id="split-tip-panel">
@@ -213,9 +219,9 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/cheatsheet.js?v=2.7.2"></script>
-  <script src="js/levels.js?v=2.7.2"></script>
-  <script src="js/practice.js?v=2.7.2"></script>
-  <script src="js/app.js?v=2.7.2"></script>
+  <script src="js/cheatsheet.js?v=2.8.0"></script>
+  <script src="js/levels.js?v=2.8.0"></script>
+  <script src="js/practice.js?v=2.8.0"></script>
+  <script src="js/app.js?v=2.8.0"></script>
 </body>
 </html>

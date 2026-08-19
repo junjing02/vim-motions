@@ -25,8 +25,21 @@ let practiceState = {
   levelTimer: null,
   levelStartTime: null,
   relativeLines: true,   // Toggle relative line numbers
-  completedLevels: new Set(),
+  solvedChallenges: new Set(), // Keys "levelIdx:challengeIdx" — persists across Next/Previous navigation
+  lastChallengeScore: 0,
 };
+
+function challengeKey(levelIdx, challengeIdx) {
+  return `${levelIdx}:${challengeIdx}`;
+}
+
+function isChallengeSolved(levelIdx, challengeIdx) {
+  return practiceState.solvedChallenges.has(challengeKey(levelIdx, challengeIdx));
+}
+
+function isLevelCompleted(levelIdx) {
+  return VIM_LEVELS[levelIdx].challenges.every((_, i) => isChallengeSolved(levelIdx, i));
+}
 
 // Initialize Practice Mode
 window.addEventListener("DOMContentLoaded", () => {
@@ -64,12 +77,15 @@ function setupPracticeEventListeners() {
 
   document.getElementById("reset-btn").addEventListener("click", () => {
     if (confirm("Are you sure you want to reset all game progress?")) {
-      practiceState.completedLevels.clear();
+      practiceState.solvedChallenges.clear();
       practiceState.score = 0;
       updateSidebar();
       loadLevel(0, 0);
     }
   });
+
+  document.getElementById("prev-challenge-btn").addEventListener("click", goToPreviousChallenge);
+  document.getElementById("next-challenge-btn").addEventListener("click", goToNextChallenge);
 
   window.addEventListener("click", (e) => {
     const modal = document.getElementById("level-modal");
@@ -121,6 +137,50 @@ function loadLevel(levelIdx, challengeIdx) {
 
   document.getElementById("hint-text").style.opacity = 0;
   updateSidebarHighlights();
+  updateChallengeNavUI();
+}
+
+// Reflects whether the current challenge is already solved: unlocks Next,
+// shows the solved badge, and disables Previous only at the very first challenge.
+function updateChallengeNavUI() {
+  const level = getActiveLevel();
+  const solved = isChallengeSolved(practiceState.currentLevelIdx, practiceState.currentChallengeIdx);
+  const isVeryFirstChallenge = practiceState.currentLevelIdx === 0 && practiceState.currentChallengeIdx === 0;
+  const isLastChallengeOfLevel = practiceState.currentChallengeIdx === level.challenges.length - 1;
+  const isLastChallengeOfLastLevel = practiceState.currentLevelIdx === VIM_LEVELS.length - 1 && isLastChallengeOfLevel;
+
+  const prevBtn = document.getElementById("prev-challenge-btn");
+  const nextBtn = document.getElementById("next-challenge-btn");
+  const badge = document.getElementById("challenge-solved-badge");
+
+  prevBtn.disabled = isVeryFirstChallenge;
+  nextBtn.disabled = !solved;
+  nextBtn.textContent = isLastChallengeOfLastLevel ? "Finish →" : (isLastChallengeOfLevel ? "Next Level →" : "Next →");
+  nextBtn.title = solved ? "" : "Solve this challenge to unlock";
+
+  badge.style.display = solved ? "inline-flex" : "none";
+}
+
+function goToPreviousChallenge() {
+  if (practiceState.currentChallengeIdx > 0) {
+    loadLevel(practiceState.currentLevelIdx, practiceState.currentChallengeIdx - 1);
+  } else if (practiceState.currentLevelIdx > 0) {
+    const prevLevel = VIM_LEVELS[practiceState.currentLevelIdx - 1];
+    loadLevel(practiceState.currentLevelIdx - 1, prevLevel.challenges.length - 1);
+  }
+}
+
+function goToNextChallenge() {
+  if (!isChallengeSolved(practiceState.currentLevelIdx, practiceState.currentChallengeIdx)) return;
+
+  const level = getActiveLevel();
+  if (practiceState.currentChallengeIdx < level.challenges.length - 1) {
+    loadLevel(practiceState.currentLevelIdx, practiceState.currentChallengeIdx + 1);
+  } else if (practiceState.currentLevelIdx < VIM_LEVELS.length - 1) {
+    showLevelCompletePopup(level.name, practiceState.lastChallengeScore);
+  } else {
+    showGameCompletePopup();
+  }
 }
 
 // Check character visual selection state
@@ -1516,48 +1576,39 @@ function updateStatusLine() {
   }
 }
 
-// Check if current challenge win conditions are satisfied
+// Check if current challenge win conditions are satisfied. Once solved, the challenge
+// stays solved (Next unlocks) but does NOT auto-advance — the player can keep
+// retrying the motion as many times as they like until they choose to move on.
 function checkChallengeCompletion() {
+  if (isChallengeSolved(practiceState.currentLevelIdx, practiceState.currentChallengeIdx)) return;
+
   const challenge = getActiveChallenge();
-  
+  let solved = false;
+
   if (challenge.type === "navigate") {
-    if (practiceState.cursor.line === challenge.target.line && practiceState.cursor.col === challenge.target.col) {
-      advanceChallenge();
-    }
+    solved = practiceState.cursor.line === challenge.target.line && practiceState.cursor.col === challenge.target.col;
   } else if (challenge.type === "edit") {
     const currentText = practiceState.buffer.join("\n").trim();
     const targetText = challenge.targetText.trim();
-    
     // Normal mode check is essential unless the challenge is v + esc navigation which does not edit
-    if (currentText === targetText && practiceState.mode === "normal") {
-      advanceChallenge();
-    }
+    solved = currentText === targetText && practiceState.mode === "normal";
   }
+
+  if (solved) markChallengeSolved();
 }
 
-function advanceChallenge() {
+function markChallengeSolved() {
+  practiceState.solvedChallenges.add(challengeKey(practiceState.currentLevelIdx, practiceState.currentChallengeIdx));
   triggerSuccessAnimation();
 
   const challengeTimeSec = (new Date() - practiceState.levelStartTime) / 1000;
   const challengeScore = Math.max(10, Math.round(100 - (practiceState.levelKeystrokes * 2) - challengeTimeSec));
   practiceState.score += challengeScore;
-  
-  updateStatsDisplay(challengeScore);
+  practiceState.lastChallengeScore = challengeScore;
 
-  const level = getActiveLevel();
-  if (practiceState.currentChallengeIdx < level.challenges.length - 1) {
-    practiceState.currentChallengeIdx++;
-    loadLevel(practiceState.currentLevelIdx, practiceState.currentChallengeIdx);
-  } else {
-    practiceState.completedLevels.add(practiceState.currentLevelIdx);
-    updateSidebar();
-    
-    if (practiceState.currentLevelIdx < VIM_LEVELS.length - 1) {
-      showLevelCompletePopup(level.name, challengeScore);
-    } else {
-      showGameCompletePopup();
-    }
-  }
+  updateStatsDisplay(challengeScore);
+  updateChallengeNavUI();
+  updateSidebar();
 }
 
 function triggerSuccessAnimation() {
@@ -1623,7 +1674,7 @@ function showGameCompletePopup() {
   document.getElementById("restart-game-btn").focus();
   document.getElementById("restart-game-btn").addEventListener("click", () => {
     overlay.remove();
-    practiceState.completedLevels.clear();
+    practiceState.solvedChallenges.clear();
     practiceState.score = 0;
     updateSidebar();
     loadLevel(0, 0);
@@ -1638,7 +1689,7 @@ function updateSidebar() {
   modalList.innerHTML = "";
 
   VIM_LEVELS.forEach((level, idx) => {
-    const isCompleted = practiceState.completedLevels.has(idx);
+    const isCompleted = isLevelCompleted(idx);
     
     // Create Table Row
     const row = document.createElement("tr");
@@ -1664,8 +1715,14 @@ function updateSidebar() {
     level.challenges.forEach((challenge, challengeIdx) => {
       const badge = document.createElement("span");
       badge.className = "subtopic-badge";
-      badge.textContent = challenge.subtopic;
-      
+
+      if (isChallengeSolved(idx, challengeIdx)) {
+        badge.classList.add("solved-subtopic");
+        badge.textContent = `✓ ${challenge.subtopic}`;
+      } else {
+        badge.textContent = challenge.subtopic;
+      }
+
       const isActiveChallenge = (idx === practiceState.currentLevelIdx && challengeIdx === practiceState.currentChallengeIdx);
       if (isActiveChallenge) {
         badge.classList.add("active-subtopic");
