@@ -11,7 +11,7 @@
 
   <!-- ?v= query strings below are cache-busting: bump them alongside APP_VERSION in js/app.js
        so a normal refresh (not just a hard refresh) picks up new JS/CSS. -->
-  <link rel="stylesheet" href="css/style.css?v=2.9.1">
+  <link rel="stylesheet" href="css/style.css?v=2.10.0">
 </head>
 <body>
 
@@ -117,19 +117,18 @@
     <div class="app-container" id="practice-view" style="display: none;">
       <aside class="campaign-sidebar" aria-label="Level list sidebar">
         <div class="sidebar-title">Motions Campaign</div>
-        <div class="levels-table-container">
-          <table id="levels-table">
-            <thead>
-              <tr>
-                <th class="col-topic">Topic</th>
-                <th class="col-subtopics">Subtopics</th>
-                <th class="col-status">Status</th>
-              </tr>
-            </thead>
-            <tbody id="levels-table-body">
-              <!-- Populated dynamically by practice.js -->
-            </tbody>
-          </table>
+
+        <div class="campaign-progress" id="campaign-progress">
+          <div class="campaign-progress-bar">
+            <div class="campaign-progress-fill" id="campaign-progress-fill" style="width: 0%;"></div>
+          </div>
+          <span class="campaign-progress-label" id="campaign-progress-label">0 / 0 challenges solved</span>
+        </div>
+
+        <div class="levels-list-container">
+          <div class="levels-list" id="levels-list">
+            <!-- Populated dynamically by practice.js -->
+          </div>
         </div>
       </aside>
 
@@ -165,13 +164,18 @@
 
           <section class="guide-panel" aria-label="Instructions">
             <div class="instruction-card" id="instruction-panel">
-              <div class="step-badge" id="step-indicator">Challenge 1 of 3</div>
+              <div class="instruction-card-top">
+                <div class="step-badge" id="step-indicator">Challenge 1 of 3</div>
+                <span class="difficulty-badge" id="level-difficulty-badge">Beginner</span>
+              </div>
               <h2 id="level-title">1. Home Row Navigation</h2>
               <p id="level-desc" class="instructions-text">Use h, j, k, l to navigate around the buffer.</p>
 
               <hr style="border: 0; border-top: 1px solid var(--border-default);">
 
               <p id="challenge-instr" class="instructions-text">Use key to reach the target...</p>
+
+              <div class="rep-progress" id="rep-progress" style="display: none;"></div>
 
               <div class="instruction-actions">
                 <button id="hint-btn" class="glow-btn">Get Hint</button>
@@ -220,9 +224,9 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/cheatsheet.js?v=2.9.1"></script>
-  <script src="js/levels.js?v=2.9.1"></script>
-  <script src="js/practice.js?v=2.9.1"></script>
-  <script src="js/app.js?v=2.9.1"></script>
+  <script src="js/cheatsheet.js?v=2.10.0"></script>
+  <script src="js/levels.js?v=2.10.0"></script>
+  <script src="js/practice.js?v=2.10.0"></script>
+  <script src="js/app.js?v=2.10.0"></script>
 </body>
 </html>

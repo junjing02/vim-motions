@@ -51,7 +51,7 @@ body {
 
 /* Reference content (shortcuts, commands, descriptions) stays selectable/copyable —
    only interactive chrome blocks selection, to avoid an accidental-highlight look on tap */
-button, .tool-tab, .category-nav-item, .subtopic-badge, .level-row,
+button, .tool-tab, .category-nav-item, .subtopic-badge, .level-card,
 .close-btn, .editor-char {
   user-select: none;
   -webkit-user-select: none;
@@ -167,7 +167,7 @@ header {
 
 /* Sidebar Campaign Selector */
 aside.campaign-sidebar {
-  width: 400px;
+  width: 380px;
   background-color: var(--bg-secondary);
   border-right: 1px solid var(--border-default);
   display: flex;
@@ -183,69 +183,112 @@ aside.campaign-sidebar {
   border-bottom: 1px solid var(--border-default);
 }
 
-.levels-table-container {
+.campaign-progress {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campaign-progress-bar {
+  height: 6px;
+  background-color: var(--bg-tertiary);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.campaign-progress-fill {
+  height: 100%;
+  background-color: var(--accent-cyan);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.campaign-progress-label {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.levels-list-container {
   flex: 1;
   overflow-y: auto;
-  padding: 5px 0;
+  padding: 12px;
 }
 
-#levels-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-code);
-  font-size: 11px;
-  line-height: 1.4;
+.levels-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-#levels-table th, #levels-table td {
-  padding: 10px 8px;
-  text-align: left;
-  vertical-align: middle;
-  border-bottom: 1px solid var(--border-default);
+.level-card--list {
+  padding: 12px;
+  gap: 8px;
 }
 
-#levels-table th {
-  font-weight: 700;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border-default);
-  background-color: var(--bg-secondary);
-  position: sticky;
-  top: 0;
-  z-index: 1;
+.level-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.col-topic { width: 130px; }
-.col-subtopics { width: 220px; }
-.col-status { width: 60px; }
-
-.level-row {
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.level-row:hover {
-  background-color: var(--bg-primary);
-}
-
-.level-row.active {
+.level-card-index {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--bg-tertiary);
-}
-
-.level-row.completed {
-  color: var(--text-muted);
-}
-
-.level-name-label {
+  color: var(--text-secondary);
+  font-size: 10px;
   font-weight: 700;
-  color: var(--text-primary);
-  font-size: 11px;
+  border-radius: var(--radius-sm);
 }
 
-.cell-subtopics {
+.level-card.completed .level-card-index {
+  background-color: var(--accent-green);
+  color: var(--bg-secondary);
+}
+
+.level-card-titles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.level-card-titles h3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.level-card-progress-bar {
+  height: 4px;
+  background-color: var(--bg-tertiary);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.level-card-progress-fill {
+  height: 100%;
+  background-color: var(--accent-cyan);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.level-card.completed .level-card-progress-fill {
+  background-color: var(--accent-green);
+}
+
+.level-card-subtopics {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  padding: 8px 6px !important;
 }
 
 .subtopic-badge {
@@ -279,20 +322,35 @@ aside.campaign-sidebar {
   color: var(--accent-green);
 }
 
-.cell-status {
+/* Difficulty badges — shared by the guide panel header, sidebar cards, and campaign modal */
+.difficulty-badge {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 9px;
   font-weight: 700;
-  color: var(--text-muted);
-  text-align: center !important;
-  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-radius: 999px;
+  border: 1px solid transparent;
 }
 
-.level-row.completed .cell-status {
+.difficulty-beginner {
   color: var(--accent-green);
+  background-color: #e6f4ec;
+  border-color: var(--accent-green);
 }
 
-.sidebar-footer {
-  padding: 15px;
-  border-top: 1px solid var(--border-default);
+.difficulty-intermediate {
+  color: var(--accent-cyan);
+  background-color: #e3eef6;
+  border-color: var(--accent-cyan);
+}
+
+.difficulty-advanced {
+  color: var(--accent-pink);
+  background-color: #f6e6ec;
+  border-color: var(--accent-pink);
 }
 
 /* Game Board Area */
@@ -534,10 +592,36 @@ main.game-board {
   gap: 12px;
 }
 
+.instruction-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .step-badge {
   font-size: 10px;
   color: var(--text-muted);
   font-weight: 700;
+}
+
+.rep-progress {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.rep-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  transition: var(--transition-fast);
+}
+
+.rep-dot-filled {
+  background-color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
 }
 
 .instructions-text {

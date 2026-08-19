@@ -2,6 +2,7 @@
 const VIM_LEVELS = [
   {
     id: "basic-vim",
+    difficulty: "Beginner",
     name: "1. Basic Vim",
     description: "Learn normal vs insert mode and the core directional movements on the home row.",
     challenges: [
@@ -59,6 +60,7 @@ const VIM_LEVELS = [
   },
   {
     id: "insert-pro",
+    difficulty: "Beginner",
     name: "2. Insert Like a Pro",
     description: "Learn advanced insertion points and short edit operators.",
     challenges: [
@@ -96,6 +98,7 @@ const VIM_LEVELS = [
   },
   {
     id: "essential-motions",
+    difficulty: "Beginner",
     name: "3. Essential Motions",
     description: "Master WORDS (whitespace-separated), line boundaries, and inline character targeting.",
     challenges: [
@@ -143,6 +146,7 @@ const VIM_LEVELS = [
   },
   {
     id: "basic-operators",
+    difficulty: "Beginner",
     name: "4. Basic Operators",
     description: "Combine operators (delete, change, yank) with motions for editing power.",
     challenges: [
@@ -210,6 +214,7 @@ const VIM_LEVELS = [
   },
   {
     id: "advanced-vertical",
+    difficulty: "Intermediate",
     name: "5. Advanced Vertical Movement",
     description: "Learn vertical line counts, top/bottom file boundaries, and paragraph jumps.",
     challenges: [
@@ -257,6 +262,7 @@ const VIM_LEVELS = [
   },
   {
     id: "search",
+    difficulty: "Intermediate",
     name: "6. Search",
     description: "Search text using patterns, repeat queries, and quickly search words under the cursor.",
     challenges: [
@@ -305,6 +311,7 @@ const VIM_LEVELS = [
   },
   {
     id: "text-objects-brackets",
+    difficulty: "Intermediate",
     name: "7. Text Objects – Bracket Pairs",
     description: "Manipulate text inside braces, parentheses, and brackets. Essential for code structure.",
     challenges: [
@@ -373,6 +380,7 @@ const VIM_LEVELS = [
   },
   {
     id: "text-objects-quotes",
+    difficulty: "Intermediate",
     name: "8. Text Objects – Quotes",
     description: "Modify string values inside single and double quotes quickly.",
     challenges: [
@@ -431,6 +439,7 @@ const VIM_LEVELS = [
   },
   {
     id: "text-objects-words",
+    difficulty: "Intermediate",
     name: "9. Text Objects – Words",
     description: "Learn inner word and around word editing targets.",
     challenges: [
@@ -479,6 +488,7 @@ const VIM_LEVELS = [
   },
   {
     id: "text-objects-paragraphs",
+    difficulty: "Intermediate",
     name: "10. Text Objects – Paragraphs",
     description: "Delete and modify full paragraphs (code blocks separated by empty lines).",
     challenges: [
@@ -527,6 +537,7 @@ const VIM_LEVELS = [
   },
   {
     id: "text-objects-mega-review",
+    difficulty: "Advanced",
     name: "11. Text Objects Mega Review",
     description: "Combine words, brackets, quotes, and paragraph objects in a single review.",
     challenges: [
@@ -545,6 +556,7 @@ const VIM_LEVELS = [
   },
   {
     id: "visual-mode",
+    difficulty: "Advanced",
     name: "12. Visual Mode",
     description: "Select, highlight, and operate on text blocks interactively.",
     challenges: [

@@ -216,6 +216,10 @@ function loadLevel(levelIdx, challengeIdx) {
   document.getElementById("challenge-instr").innerHTML = challenge.instructions;
   document.getElementById("step-indicator").textContent = `Challenge ${challengeIdx + 1} of ${level.challenges.length}`;
 
+  const difficultyBadge = document.getElementById("level-difficulty-badge");
+  difficultyBadge.textContent = level.difficulty;
+  difficultyBadge.className = `difficulty-badge difficulty-${level.difficulty.toLowerCase()}`;
+
   document.getElementById("split-tip-text").textContent = challenge.splitTip || "";
 
   document.getElementById("hint-text").style.opacity = 0;
@@ -238,6 +242,19 @@ function updateChallengeNavUI() {
   const prevBtn = document.getElementById("prev-challenge-btn");
   const nextBtn = document.getElementById("next-challenge-btn");
   const badge = document.getElementById("challenge-solved-badge");
+  const repProgress = document.getElementById("rep-progress");
+
+  if (requiredReps > 1) {
+    const dots = [];
+    for (let i = 0; i < requiredReps; i++) {
+      const filled = solved || i < practiceState.repsCompleted;
+      dots.push(`<span class="rep-dot ${filled ? "rep-dot-filled" : ""}"></span>`);
+    }
+    repProgress.innerHTML = dots.join("");
+    repProgress.style.display = "flex";
+  } else {
+    repProgress.style.display = "none";
+  }
 
   prevBtn.disabled = isVeryFirstChallenge;
   nextBtn.disabled = !solved;
@@ -1821,37 +1838,57 @@ function showGameCompletePopup() {
   });
 }
 
+function countSolvedInLevel(levelIdx) {
+  return VIM_LEVELS[levelIdx].challenges.reduce((n, _, i) => n + (isChallengeSolved(levelIdx, i) ? 1 : 0), 0);
+}
+
 function updateSidebar() {
-  const tableBody = document.getElementById("levels-table-body");
+  const list = document.getElementById("levels-list");
   const modalList = document.getElementById("modal-levels-list");
-  
-  tableBody.innerHTML = "";
+
+  list.innerHTML = "";
   modalList.innerHTML = "";
+
+  let totalChallenges = 0;
+  let totalSolved = 0;
 
   VIM_LEVELS.forEach((level, idx) => {
     const isCompleted = isLevelCompleted(idx);
-    
-    // Create Table Row
-    const row = document.createElement("tr");
-    row.className = `level-row ${isCompleted ? "completed" : ""}`;
-    row.id = `sidebar-level-${idx}`;
-    if (idx === practiceState.currentLevelIdx) {
-      row.classList.add("active");
-    }
+    const solvedCount = countSolvedInLevel(idx);
+    const total = level.challenges.length;
+    const pct = Math.round((solvedCount / total) * 100);
+    totalChallenges += total;
+    totalSolved += solvedCount;
 
-    // 1. Topic Cell
-    const topicCell = document.createElement("td");
-    topicCell.className = "cell-topic";
-    topicCell.innerHTML = `<span class="level-name-label">${level.name}</span>`;
-    topicCell.addEventListener("click", () => {
-      loadLevel(idx, 0);
-    });
-    row.appendChild(topicCell);
+    // Sidebar list card — level header, progress bar, and clickable subtopic pills
+    const card = document.createElement("div");
+    card.className = `level-card level-card--list ${isCompleted ? "completed" : ""}`;
+    card.id = `sidebar-level-${idx}`;
+    if (idx === practiceState.currentLevelIdx) card.classList.add("active");
 
-    // 2. Subtopics Cell (clickable list of subtopics!)
-    const subtopicsCell = document.createElement("td");
-    subtopicsCell.className = "cell-subtopics";
-    
+    const top = document.createElement("div");
+    top.className = "level-card-top";
+    top.innerHTML = `
+      <span class="level-card-index">${idx + 1}</span>
+      <div class="level-card-titles">
+        <h3>${level.name.replace(/^\d+\.\s*/, "")}</h3>
+        <span class="difficulty-badge difficulty-${level.difficulty.toLowerCase()}">${level.difficulty}</span>
+      </div>
+      <span class="level-card-status">${isCompleted ? "✓" : `${solvedCount}/${total}`}</span>
+    `;
+    top.addEventListener("click", () => loadLevel(idx, 0));
+    card.appendChild(top);
+
+    const barWrap = document.createElement("div");
+    barWrap.className = "level-card-progress-bar";
+    const barFill = document.createElement("div");
+    barFill.className = "level-card-progress-fill";
+    barFill.style.width = `${pct}%`;
+    barWrap.appendChild(barFill);
+    card.appendChild(barWrap);
+
+    const subtopics = document.createElement("div");
+    subtopics.className = "level-card-subtopics";
     level.challenges.forEach((challenge, challengeIdx) => {
       const badge = document.createElement("span");
       badge.className = "subtopic-badge";
@@ -1867,44 +1904,44 @@ function updateSidebar() {
       if (isActiveChallenge) {
         badge.classList.add("active-subtopic");
       }
-      
+
       badge.addEventListener("click", (e) => {
-        e.stopPropagation(); // prevent row click loading challenge 0
+        e.stopPropagation(); // prevent card click loading challenge 0
         loadLevel(idx, challengeIdx);
       });
-      
-      subtopicsCell.appendChild(badge);
+
+      subtopics.appendChild(badge);
     });
-    row.appendChild(subtopicsCell);
+    card.appendChild(subtopics);
 
-    // 3. Status Cell
-    const statusCell = document.createElement("td");
-    statusCell.className = "cell-status";
-    statusCell.textContent = isCompleted ? "[ok]" : "[  ]";
-    row.appendChild(statusCell);
+    list.appendChild(card);
 
-    tableBody.appendChild(row);
+    // Campaign Map modal grid card — compact summary, no subtopic pills
+    const modalCard = document.createElement("div");
+    modalCard.className = `level-card ${isCompleted ? "completed" : ""}`;
+    if (idx === practiceState.currentLevelIdx) modalCard.classList.add("active");
 
-    // Modal grid cards (keep modal rendering intact)
-    const card = document.createElement("div");
-    card.className = `level-card ${isCompleted ? "completed" : ""}`;
-    if (idx === practiceState.currentLevelIdx) card.classList.add("active");
-    
-    card.innerHTML = `
-      <div class="level-card-status">${isCompleted ? "✓ Completed" : "○ Incomplete"}</div>
+    modalCard.innerHTML = `
+      <div class="level-card-status">${isCompleted ? "✓ Completed" : `○ ${solvedCount}/${total} solved`}</div>
       <h3>${level.name}</h3>
+      <span class="difficulty-badge difficulty-${level.difficulty.toLowerCase()}">${level.difficulty}</span>
       <p>${level.description}</p>
+      <div class="level-card-progress-bar"><div class="level-card-progress-fill" style="width: ${pct}%;"></div></div>
     `;
-    card.addEventListener("click", () => {
+    modalCard.addEventListener("click", () => {
       document.getElementById("level-modal").style.display = "none";
       loadLevel(idx, 0);
     });
-    modalList.appendChild(card);
+    modalList.appendChild(modalCard);
   });
+
+  const overallPct = totalChallenges > 0 ? Math.round((totalSolved / totalChallenges) * 100) : 0;
+  document.getElementById("campaign-progress-fill").style.width = `${overallPct}%`;
+  document.getElementById("campaign-progress-label").textContent = `${totalSolved} / ${totalChallenges} challenges solved`;
 }
 
 function updateSidebarHighlights() {
-  document.querySelectorAll(".level-row").forEach((el, idx) => {
+  document.querySelectorAll(".level-card--list").forEach((el, idx) => {
     el.classList.remove("active");
     if (idx === practiceState.currentLevelIdx) {
       el.classList.add("active");
