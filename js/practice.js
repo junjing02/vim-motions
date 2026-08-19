@@ -2,6 +2,15 @@
 // Only responds to keystrokes while isPracticeActive is true.
 let isPracticeActive = false;
 
+// How many times a challenge must be solved (each with a fresh/randomized scenario when
+// available) before Next unlocks. Individual challenges can override via `requiredReps`.
+const DEFAULT_REQUIRED_REPS = 3;
+const REP_SWITCH_DELAY_MS = 600; // brief pause so the success flash is visible before the scenario changes
+
+function getRequiredReps(challenge) {
+  return challenge.requiredReps || DEFAULT_REQUIRED_REPS;
+}
+
 // Game State
 let practiceState = {
   currentLevelIdx: 0,
@@ -27,6 +36,9 @@ let practiceState = {
   relativeLines: true,   // Toggle relative line numbers
   solvedChallenges: new Set(), // Keys "levelIdx:challengeIdx" — persists across Next/Previous navigation
   lastChallengeScore: 0,
+  repsCompleted: 0,       // Successful reps on the current (not-yet-unlocked) challenge
+  currentInstance: null,  // The active scenario: { text, start, target } or { text, start, targetText }
+  repTransitioning: false, // True during the brief pause between a solved rep and the next scenario loading
 };
 
 function challengeKey(levelIdx, challengeIdx) {
@@ -103,48 +115,113 @@ function getActiveChallenge() {
   return getActiveLevel().challenges[practiceState.currentChallengeIdx];
 }
 
-// Load level and challenge
-function loadLevel(levelIdx, challengeIdx) {
-  practiceState.currentLevelIdx = levelIdx;
-  practiceState.currentChallengeIdx = challengeIdx;
+// Builds candidate {line, col} targets from every non-whitespace character in `text`,
+// excluding the challenge's own starting cursor position. Lets navigate-type challenges
+// get a fresh, randomized target each rep with zero extra content authoring.
+function getNavigateTargetCandidates(text, startLine, startCol) {
+  const lines = text.split("\n");
+  const candidates = [];
+  lines.forEach((lineText, lineIdx) => {
+    for (let col = 0; col < lineText.length; col++) {
+      if (lineIdx === startLine && col === startCol) continue;
+      if (/\S/.test(lineText[col])) candidates.push({ line: lineIdx, col });
+    }
+  });
+  return candidates;
+}
+
+// Picks a random element from arr, avoiding one matched by isSame() when the pool has
+// other options. Bounded retry guards against a bad isSame() ever spinning forever.
+function pickRandomExcluding(arr, isSame) {
+  if (arr.length === 0) return null;
+  if (arr.length === 1) return arr[0];
+  let pick = arr[Math.floor(Math.random() * arr.length)];
+  if (!isSame) return pick;
+  for (let guard = 0; guard < 20 && isSame(pick); guard++) {
+    pick = arr[Math.floor(Math.random() * arr.length)];
+  }
+  return pick;
+}
+
+// Picks the next scenario instance for the active challenge: a random target (navigate)
+// or a random text/targetText variant (edit, when the challenge defines `variants`).
+// Falls back to the challenge's own base scenario when there's nothing to vary.
+function pickChallengeInstance(challenge, avoidInstance) {
+  if (challenge.type === "navigate") {
+    const candidates = getNavigateTargetCandidates(challenge.text, challenge.start.line, challenge.start.col);
+    const avoidTarget = avoidInstance && avoidInstance.target;
+    const target = candidates.length > 0
+      ? pickRandomExcluding(candidates, avoidTarget ? (c => c.line === avoidTarget.line && c.col === avoidTarget.col) : null)
+      : challenge.target;
+    return { text: challenge.text, start: challenge.start, target };
+  }
+
+  if (challenge.type === "edit" && challenge.variants && challenge.variants.length > 0) {
+    const pool = [{ text: challenge.text, start: challenge.start, targetText: challenge.targetText }, ...challenge.variants];
+    const avoidText = avoidInstance && avoidInstance.targetText;
+    return pickRandomExcluding(pool, avoidText ? (v => v.targetText === avoidText) : null);
+  }
+
+  return { text: challenge.text, start: challenge.start, targetText: challenge.targetText };
+}
+
+// Loads a fresh scenario for the current challenge without touching level/challenge
+// index or rep progress — used both by loadLevel() and mid-challenge rep switches.
+function startChallengeInstance() {
+  const challenge = getActiveChallenge();
+  practiceState.currentInstance = pickChallengeInstance(challenge, practiceState.currentInstance);
+  const instance = practiceState.currentInstance;
+
   practiceState.mode = "normal";
   practiceState.pendingKeys = "";
   practiceState.digitBuffer = "";
   practiceState.searchQuery = "";
-  
+
+  practiceState.buffer = instance.text.split("\n");
+  practiceState.cursor = { ...instance.start };
+  practiceState.visualAnchor = { ...instance.start };
+
+  practiceState.levelKeystrokes = 0;
+  practiceState.levelStartTime = new Date();
+
+  renderEditor();
+  updateStatusLine();
+}
+
+// Load level and challenge
+function loadLevel(levelIdx, challengeIdx) {
+  practiceState.currentLevelIdx = levelIdx;
+  practiceState.currentChallengeIdx = challengeIdx;
+  practiceState.repsCompleted = 0;
+  practiceState.currentInstance = null;
+  practiceState.repTransitioning = false;
+
   const level = getActiveLevel();
   const challenge = getActiveChallenge();
 
-  // Load buffer
-  practiceState.buffer = challenge.text.split("\n");
-  practiceState.cursor = { ...challenge.start };
-  practiceState.visualAnchor = { ...challenge.start };
-
-  // Stats initializations
-  practiceState.levelKeystrokes = 0;
-  practiceState.levelStartTime = new Date();
+  startChallengeInstance();
 
   // Setup UI texts
   document.getElementById("level-title").textContent = level.name;
   document.getElementById("level-desc").textContent = level.description;
   document.getElementById("challenge-instr").innerHTML = challenge.instructions;
   document.getElementById("step-indicator").textContent = `Challenge ${challengeIdx + 1} of ${level.challenges.length}`;
-  
-  document.getElementById("split-tip-text").textContent = challenge.splitTip || "";
 
-  renderEditor();
-  updateStatusLine();
+  document.getElementById("split-tip-text").textContent = challenge.splitTip || "";
 
   document.getElementById("hint-text").style.opacity = 0;
   updateSidebarHighlights();
   updateChallengeNavUI();
 }
 
-// Reflects whether the current challenge is already solved: unlocks Next,
-// shows the solved badge, and disables Previous only at the very first challenge.
+// Reflects challenge progress: rep count while still practicing, solved badge once
+// the required reps are met (which unlocks Next). Previous is disabled only at the
+// very first challenge of the whole curriculum.
 function updateChallengeNavUI() {
   const level = getActiveLevel();
+  const challenge = getActiveChallenge();
   const solved = isChallengeSolved(practiceState.currentLevelIdx, practiceState.currentChallengeIdx);
+  const requiredReps = getRequiredReps(challenge);
   const isVeryFirstChallenge = practiceState.currentLevelIdx === 0 && practiceState.currentChallengeIdx === 0;
   const isLastChallengeOfLevel = practiceState.currentChallengeIdx === level.challenges.length - 1;
   const isLastChallengeOfLastLevel = practiceState.currentLevelIdx === VIM_LEVELS.length - 1 && isLastChallengeOfLevel;
@@ -156,9 +233,21 @@ function updateChallengeNavUI() {
   prevBtn.disabled = isVeryFirstChallenge;
   nextBtn.disabled = !solved;
   nextBtn.textContent = isLastChallengeOfLastLevel ? "Finish →" : (isLastChallengeOfLevel ? "Next Level →" : "Next →");
-  nextBtn.title = solved ? "" : "Solve this challenge to unlock";
+  nextBtn.title = solved ? "" : "Solve this challenge the required number of times to unlock";
 
-  badge.style.display = solved ? "inline-flex" : "none";
+  if (solved) {
+    badge.textContent = "✓ Solved — keep practicing or move on";
+    badge.classList.remove("challenge-progress-badge");
+    badge.style.display = "inline-flex";
+  } else if (practiceState.repsCompleted > 0) {
+    badge.textContent = practiceState.repTransitioning
+      ? `✓ ${practiceState.repsCompleted} / ${requiredReps} reps — new one incoming...`
+      : `${practiceState.repsCompleted} / ${requiredReps} reps — keep practicing!`;
+    badge.classList.add("challenge-progress-badge");
+    badge.style.display = "inline-flex";
+  } else {
+    badge.style.display = "none";
+  }
 }
 
 function goToPreviousChallenge() {
@@ -273,7 +362,8 @@ function renderEditor() {
         charSpan.innerHTML = "&nbsp;";
       }
 
-      if (challenge.type === "navigate" && challenge.target.line === lineIdx && challenge.target.col === colIdx) {
+      const navTarget = practiceState.currentInstance && practiceState.currentInstance.target;
+      if (challenge.type === "navigate" && navTarget && navTarget.line === lineIdx && navTarget.col === colIdx) {
         charSpan.classList.add("char-target");
       }
 
@@ -1580,35 +1670,59 @@ function updateStatusLine() {
 // stays solved (Next unlocks) but does NOT auto-advance — the player can keep
 // retrying the motion as many times as they like until they choose to move on.
 function checkChallengeCompletion() {
+  if (practiceState.repTransitioning) return;
   if (isChallengeSolved(practiceState.currentLevelIdx, practiceState.currentChallengeIdx)) return;
 
   const challenge = getActiveChallenge();
+  const instance = practiceState.currentInstance;
   let solved = false;
 
   if (challenge.type === "navigate") {
-    solved = practiceState.cursor.line === challenge.target.line && practiceState.cursor.col === challenge.target.col;
+    solved = practiceState.cursor.line === instance.target.line && practiceState.cursor.col === instance.target.col;
   } else if (challenge.type === "edit") {
     const currentText = practiceState.buffer.join("\n").trim();
-    const targetText = challenge.targetText.trim();
+    const targetText = instance.targetText.trim();
     // Normal mode check is essential unless the challenge is v + esc navigation which does not edit
     solved = currentText === targetText && practiceState.mode === "normal";
   }
 
-  if (solved) markChallengeSolved();
+  if (solved) handleRepSolved();
 }
 
-function markChallengeSolved() {
-  practiceState.solvedChallenges.add(challengeKey(practiceState.currentLevelIdx, practiceState.currentChallengeIdx));
+// One successful solve of the current scenario. Below the required rep count, this
+// awards partial score and swaps in a fresh (often randomized) scenario for another
+// go — the player keeps practicing the same motion instead of instantly moving on.
+// Once the rep count is met, the challenge unlocks Next for good.
+function handleRepSolved() {
+  practiceState.repsCompleted++;
   triggerSuccessAnimation();
 
   const challengeTimeSec = (new Date() - practiceState.levelStartTime) / 1000;
-  const challengeScore = Math.max(10, Math.round(100 - (practiceState.levelKeystrokes * 2) - challengeTimeSec));
-  practiceState.score += challengeScore;
-  practiceState.lastChallengeScore = challengeScore;
+  const requiredReps = getRequiredReps(getActiveChallenge());
+  const rawScore = Math.max(10, Math.round(100 - (practiceState.levelKeystrokes * 2) - challengeTimeSec));
+  const repScore = Math.max(1, Math.round(rawScore / requiredReps));
+  practiceState.score += repScore;
+  practiceState.lastChallengeScore = repScore;
+  updateStatsDisplay(repScore);
 
-  updateStatsDisplay(challengeScore);
-  updateChallengeNavUI();
-  updateSidebar();
+  if (practiceState.repsCompleted >= requiredReps) {
+    practiceState.solvedChallenges.add(challengeKey(practiceState.currentLevelIdx, practiceState.currentChallengeIdx));
+    updateChallengeNavUI();
+    updateSidebar();
+  } else {
+    practiceState.repTransitioning = true;
+    updateChallengeNavUI();
+    const levelIdx = practiceState.currentLevelIdx;
+    const challengeIdx = practiceState.currentChallengeIdx;
+    setTimeout(() => {
+      // Bail if the player navigated away (e.g. clicked Previous) during the pause —
+      // don't clobber whatever challenge they're on now.
+      if (practiceState.currentLevelIdx !== levelIdx || practiceState.currentChallengeIdx !== challengeIdx) return;
+      startChallengeInstance();
+      practiceState.repTransitioning = false;
+      updateChallengeNavUI();
+    }, REP_SWITCH_DELAY_MS);
+  }
 }
 
 function triggerSuccessAnimation() {

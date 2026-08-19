@@ -578,6 +578,10 @@ main.game-board {
   color: var(--accent-green);
 }
 
+.challenge-solved-badge.challenge-progress-badge {
+  color: var(--accent-cyan);
+}
+
 .challenge-nav .glow-btn:disabled,
 .challenge-nav .btn-secondary:disabled {
   opacity: 0.4;

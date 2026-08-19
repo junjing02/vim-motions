@@ -7,12 +7,17 @@ const VIM_LEVELS = [
     challenges: [
       {
         subtopic: "modes",
-        instructions: "Vim has modes. Normal mode is for navigating. Press <span class='key-cap'>i</span> to enter Insert mode, type the word <strong>'modes'</strong>, then press <span class='key-cap'>Esc</span> to return to Normal mode to complete the challenge.",
+        instructions: "Vim has modes. Normal mode is for navigating. Press <span class='key-cap'>a</span> to enter Insert mode after the cursor, type the word <strong>'modes'</strong>, then press <span class='key-cap'>Esc</span> to return to Normal mode to complete the challenge.",
         text: "Vim has multiple ",
         targetText: "Vim has multiple modes",
-        start: { line: 0, col: 18 },
+        start: { line: 0, col: 16 }, // on the trailing space, the last character on the line
         type: "edit",
-        hint: "Press 'i', type 'modes', then press 'Escape'.",
+        requiredReps: 3,
+        variants: [
+          { text: "Learning takes ", targetText: "Learning takes practice", start: { line: 0, col: 14 } },
+          { text: "Vim saves so much ", targetText: "Vim saves so much time", start: { line: 0, col: 17 } }
+        ],
+        hint: "Press 'a', type 'modes', then press 'Escape'.",
         splitTip: "Split Keyboard Tip: Map Esc to a thumb key or Caps Lock so your left pinky doesn't have to reach to the far top-left corner!"
       },
       {
@@ -42,7 +47,12 @@ const VIM_LEVELS = [
         targetText: "learn vim",
         start: { line: 0, col: 3 }, // on 'n'
         type: "edit",
-        hint: "Move cursor to 'a' position, insert 'r', then move to end and append 'm'. Remember to hit Esc.",
+        requiredReps: 3,
+        variants: [
+          { text: "tets ru", targetText: "tests run", start: { line: 0, col: 2 } }, // on 2nd 't'
+          { text: "wam da", targetText: "warm day", start: { line: 0, col: 2 } } // on 'm'
+        ],
+        hint: "The cursor already sits on 'n' — press 'i' right here to insert 'r' before it. Then press '$' to reach the end and 'a' to append 'm'. Remember to hit Esc after each edit.",
         splitTip: "Split Keyboard Tip: Esc is a highly frequent key. Try setting up a dual-role key (tapping Caps Lock acts as Esc, holding acts as Ctrl)."
       }
     ]
@@ -113,7 +123,7 @@ const VIM_LEVELS = [
         subtopic: "f, F, ;",
         instructions: "Use <span class='key-cap'>f</span> followed by a character to search forward, or <span class='key-cap'>F</span> to search backward. Press <span class='key-cap'>;</span> (semicolon) to repeat the search to the letter <strong>'o'</strong> in <strong>'options'</strong>.",
         text: "const options = { port: 80, host: 'localhost' };",
-        start: { line: 0, col: 48 }, // ';'
+        start: { line: 0, col: 47 }, // ';'
         target: { line: 0, col: 6 },  // 'o' in options
         type: "navigate",
         hint: "Press 'Fo' to search backward for 'o', then ';' repeatedly until you reach the start of options.",
@@ -287,6 +297,7 @@ const VIM_LEVELS = [
         targetText: "let type = \"public\";\n// middle line\nlet view = \"normal\";",
         start: { line: 2, col: 15 },
         type: "edit",
+        requiredReps: 1, // Compound review challenge — one careful rep is enough
         hint: "Type '?secret' and press Enter to search backward. Press 'cw', type 'public', and hit Esc.",
         splitTip: "Split Keyboard Tip: Combines search, operators, and insert mode. Practice returning to Normal mode with Esc!"
       }
@@ -302,7 +313,7 @@ const VIM_LEVELS = [
         instructions: "Text objects allow editing inside structure boundaries. To complete the intro, enter insert mode, type <strong>'text objects'</strong> at the end of the line, and return to Normal mode.",
         text: "Vim masters use ",
         targetText: "Vim masters use text objects",
-        start: { line: 0, col: 16 },
+        start: { line: 0, col: 15 }, // on the trailing space, the last character on the line
         type: "edit",
         hint: "Press 'A', type 'text objects', then press Escape.",
         splitTip: "Split Keyboard Tip: Text objects are Vim's most famous feature, and keep you from manual deletion."
@@ -354,6 +365,7 @@ const VIM_LEVELS = [
         targetText: "dispatch();",
         start: { line: 0, col: 25 }, // inside the outer parenthesis
         type: "edit",
+        requiredReps: 1, // Compound review challenge — one careful rep is enough
         hint: "Position cursor on 'updateUserStatus' inside the outer parenthesis, and press 'di)'.",
         splitTip: "Split Keyboard Tip: Vim parses matching bracket nesting automatically, so you don't have to count characters."
       }
@@ -411,6 +423,7 @@ const VIM_LEVELS = [
         targetText: "const name = \"Vim\";",
         start: { line: 0, col: 15 },
         type: "edit",
+        requiredReps: 1, // Compound review challenge — one careful rep is enough
         hint: "Type 'ci\"', type 'Vim', and press Esc.",
         splitTip: "Split Keyboard Tip: Keep practicing Esc key rolls to build fluid muscle memory."
       }
@@ -458,6 +471,7 @@ const VIM_LEVELS = [
         targetText: "let list = [items, values];",
         start: { line: 0, col: 20 },
         type: "edit",
+        requiredReps: 1, // Compound review challenge — one careful rep is enough
         hint: "Position cursor on 'remove' and press 'daw'. Notice how it deletes the trailing comma space.",
         splitTip: "Split Keyboard Tip: 'daw' understands code spacing, keeping variables neat."
       }
@@ -505,6 +519,7 @@ const VIM_LEVELS = [
         targetText: "let start = true;\n\n\nlet end = false;",
         start: { line: 2, col: 0 },
         type: "edit",
+        requiredReps: 1, // Compound review challenge — one careful rep is enough
         hint: "Press 'dip' anywhere inside the commented paragraph.",
         splitTip: "Split Keyboard Tip: Enforces vertical editing speed without line-by-line highlights."
       }
@@ -522,6 +537,7 @@ const VIM_LEVELS = [
         targetText: "const status = ;",
         start: { line: 0, col: 17 }, // inside quotes
         type: "edit",
+        requiredReps: 1, // Compound review challenge — one careful rep is enough
         hint: "Press 'ci'' to change to 'success'. Press Esc, then type 'da['.",
         splitTip: "Split Keyboard Tip: Flowing between 'ci'' and 'da[' develops professional muscle memory."
       }
