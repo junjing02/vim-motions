@@ -11,7 +11,7 @@
 
   <!-- ?v= query strings below are cache-busting: bump them alongside APP_VERSION in js/app.js
        so a normal refresh (not just a hard refresh) picks up new JS/CSS. -->
-  <link rel="stylesheet" href="css/style.css?v=2.7.0">
+  <link rel="stylesheet" href="css/style.css?v=2.7.1">
 </head>
 <body>
 
@@ -71,19 +71,24 @@
 
         <!-- Corne 42 only: visual key layout per layer -->
         <section class="corne-keyboard-section" id="corne-keyboard-section" style="display: none;">
-          <div class="corne-layout-tabs" id="corne-layout-tabs"></div>
+          <div class="corne-picker-row">
+            <div class="corne-layout-tabs" id="corne-layout-tabs"></div>
 
-          <div class="corne-upload-row">
-            <label for="corne-vil-upload" class="corne-upload-btn">Upload your .vil file</label>
-            <input type="file" id="corne-vil-upload" accept=".vil,.json" hidden>
-            <span class="corne-upload-status" id="corne-upload-status">Stays in your browser — never uploaded anywhere.</span>
-            <button class="corne-upload-clear" id="corne-upload-clear" style="display: none;">Remove</button>
+            <div class="corne-upload-row">
+              <label for="corne-vil-upload" class="corne-upload-btn">Upload your .vil file</label>
+              <input type="file" id="corne-vil-upload" accept=".vil,.json" hidden>
+              <span class="corne-upload-status" id="corne-upload-status">Stays in your browser — never uploaded anywhere.</span>
+              <button class="corne-upload-clear" id="corne-upload-clear" style="display: none;">Remove</button>
+            </div>
           </div>
 
-          <div class="corne-layer-tabs" id="corne-layer-tabs"></div>
-          <div class="corne-keyboard-scroll">
-            <div class="corne-keyboard-grid" id="corne-keyboard-grid"></div>
+          <div class="corne-viewer">
+            <div class="corne-layer-tabs" id="corne-layer-tabs"></div>
+            <div class="corne-keyboard-scroll">
+              <div class="corne-keyboard-grid" id="corne-keyboard-grid"></div>
+            </div>
           </div>
+
           <p class="corne-keyboard-note" id="corne-keyboard-note"></p>
         </section>
 
@@ -208,9 +213,9 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/cheatsheet.js?v=2.7.0"></script>
-  <script src="js/levels.js?v=2.7.0"></script>
-  <script src="js/practice.js?v=2.7.0"></script>
-  <script src="js/app.js?v=2.7.0"></script>
+  <script src="js/cheatsheet.js?v=2.7.1"></script>
+  <script src="js/levels.js?v=2.7.1"></script>
+  <script src="js/practice.js?v=2.7.1"></script>
+  <script src="js/app.js?v=2.7.1"></script>
 </body>
 </html>

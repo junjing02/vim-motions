@@ -981,7 +981,16 @@ main.game-board {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+}
+
+/* Layout picker + upload sit side-by-side: both are ways to choose what to view */
+.corne-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .corne-layout-tabs {
@@ -1064,13 +1073,20 @@ main.game-board {
   border-color: var(--accent-red);
 }
 
+/* Layer tabs + keyboard grid are one tightly-coupled "viewer" zone, set off from
+   the picker row above by the same divider treatment used by .corne-keyboard-note below */
+.corne-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border-default);
+}
+
 .corne-layer-tabs {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-top: 4px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--border-default);
 }
 
 .corne-layer-tab {
@@ -1157,8 +1173,7 @@ main.game-board {
 }
 
 .corne-keyboard-note {
-  margin-top: 2px;
-  padding-top: 12px;
+  padding-top: 16px;
   border-top: 1px solid var(--border-default);
   font-size: 11px;
   color: var(--text-muted);
