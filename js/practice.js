@@ -564,15 +564,6 @@ function handleNormalOrVisualModeKey(key) {
         practiceState.visualAnchor = { ...practiceState.cursor };
       }
       break;
-    case "o":
-      // Swap selection cursor ends in Visual Mode
-      if (practiceState.mode === "visual" || practiceState.mode === "visual-line") {
-        const temp = { ...practiceState.cursor };
-        practiceState.cursor = { ...practiceState.visualAnchor };
-        practiceState.visualAnchor = temp;
-      }
-      break;
-
     // Editing Operators (Normal and Visual Mode routing)
     case "d":
     case "c":
@@ -637,10 +628,17 @@ function handleNormalOrVisualModeKey(key) {
       practiceState.mode = "insert";
       break;
     case "o":
-      practiceState.buffer.splice(practiceState.cursor.line + 1, 0, "");
-      practiceState.cursor.line++;
-      practiceState.cursor.col = 0;
-      practiceState.mode = "insert";
+      if (practiceState.mode === "visual" || practiceState.mode === "visual-line") {
+        // Swap selection cursor ends in Visual Mode
+        const temp = { ...practiceState.cursor };
+        practiceState.cursor = { ...practiceState.visualAnchor };
+        practiceState.visualAnchor = temp;
+      } else {
+        practiceState.buffer.splice(practiceState.cursor.line + 1, 0, "");
+        practiceState.cursor.line++;
+        practiceState.cursor.col = 0;
+        practiceState.mode = "insert";
+      }
       break;
     case "O":
       practiceState.buffer.splice(practiceState.cursor.line, 0, "");
