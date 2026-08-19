@@ -1,6 +1,6 @@
 {
   "name": "terminal-ide-cheatsheet",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "description": "The go-to reference for a terminal dev workflow: Neovim, tmux, lazygit, Claude Code, and the Corne 42 split keyboard, plus a Workflow tab showing how they fit together and a Vim motions practice drill.",
   "main": "server.js",
   "scripts": {

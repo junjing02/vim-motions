@@ -39,6 +39,7 @@ let practiceState = {
   repsCompleted: 0,       // Successful reps on the current (not-yet-unlocked) challenge
   currentInstance: null,  // The active scenario: { text, start, target } or { text, start, targetText }
   repTransitioning: false, // True during the brief pause between a solved rep and the next scenario loading
+  levelScore: {},         // levelIdx -> total score earned in that level, so "Restart Level" can roll it back
 };
 
 function challengeKey(levelIdx, challengeIdx) {
@@ -90,9 +91,17 @@ function setupPracticeEventListeners() {
   document.getElementById("reset-btn").addEventListener("click", () => {
     if (confirm("Are you sure you want to reset all game progress?")) {
       practiceState.solvedChallenges.clear();
+      practiceState.levelScore = {};
       practiceState.score = 0;
       updateSidebar();
       loadLevel(0, 0);
+    }
+  });
+
+  document.getElementById("restart-level-btn").addEventListener("click", () => {
+    const level = getActiveLevel();
+    if (confirm(`Restart "${level.name}"? Your progress on other levels won't be affected.`)) {
+      restartLevel(practiceState.currentLevelIdx);
     }
   });
 
@@ -270,6 +279,22 @@ function goToNextChallenge() {
   } else {
     showGameCompletePopup();
   }
+}
+
+// Restarts only the level currently being played: clears its solved challenges
+// (re-locking Next on each) and rolls back the score earned within it, leaving
+// every other level's progress and score untouched.
+function restartLevel(levelIdx) {
+  const level = VIM_LEVELS[levelIdx];
+  level.challenges.forEach((_, i) => practiceState.solvedChallenges.delete(challengeKey(levelIdx, i)));
+
+  const earned = practiceState.levelScore[levelIdx] || 0;
+  practiceState.score = Math.max(0, practiceState.score - earned);
+  practiceState.levelScore[levelIdx] = 0;
+  document.getElementById("stat-score").textContent = practiceState.score;
+
+  updateSidebar();
+  loadLevel(levelIdx, 0);
 }
 
 // Check character visual selection state
@@ -1703,6 +1728,7 @@ function handleRepSolved() {
   const repScore = Math.max(1, Math.round(rawScore / requiredReps));
   practiceState.score += repScore;
   practiceState.lastChallengeScore = repScore;
+  practiceState.levelScore[practiceState.currentLevelIdx] = (practiceState.levelScore[practiceState.currentLevelIdx] || 0) + repScore;
   updateStatsDisplay(repScore);
 
   if (practiceState.repsCompleted >= requiredReps) {
